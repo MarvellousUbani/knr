@@ -1,0 +1,106 @@
+{{ 'knr-how-to-use.css' | asset_url | stylesheet_tag }}
+
+<section class="knr-section knr-howto" aria-labelledby="KnrHowto-{{ section.id }}">
+  <knr-scroller class="knr-howto__inner">
+    <h2 id="KnrHowto-{{ section.id }}" class="knr-howto__heading knr-heading-title knr-container">
+      {{- section.settings.heading | escape -}}
+    </h2>
+
+    <ol class="knr-scroller knr-howto__list" role="list" data-scroller-track>
+      {%- for block in section.blocks -%}
+        <li class="knr-howto__step" {{ block.shopify_attributes }}>
+          <div class="knr-media knr-howto__media">
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 1344
+                | image_tag:
+                  widths: '255, 510, 765, 896, 1344',
+                  sizes: '(min-width: 990px) calc((100vw - 96px) / 3), (min-width: 750px) 40vw, 255px',
+                  loading: 'lazy',
+                  alt: block.settings.image.alt
+              }}
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+          <div class="knr-howto__body">
+            <p class="knr-howto__index" aria-hidden="true">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</p>
+            <h3 class="knr-howto__title">{{ block.settings.title | escape }}</h3>
+            {%- if block.settings.text != blank -%}
+              <div class="knr-howto__text">{{ block.settings.text }}</div>
+            {%- endif -%}
+            {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+              <a class="knr-link knr-howto__link" href="{{ block.settings.link }}">
+                {{- block.settings.link_label | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ol>
+
+    <div class="knr-progress knr-howto__progress" aria-hidden="true">
+      <span class="knr-progress__bar" data-progress-bar></span>
+    </div>
+  </knr-scroller>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · How to use",
+  "tag": "div",
+  "class": "section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "How to use"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Découvrir"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "default": "Lire plus"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · How to use",
+      "blocks": [{ "type": "step" }, { "type": "step" }, { "type": "step" }]
+    }
+  ]
+}
+{% endschema %}

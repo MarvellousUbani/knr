@@ -280,6 +280,15 @@
           </localization-form>
         {%- endif -%}
       </div>
+      {%- if section.settings.store_locator_link != blank -%}
+        <a
+          href="{{ section.settings.store_locator_link }}"
+          class="header__icon header__icon--locator link focus-inset"
+        >
+          {%- render 'knr-icon', icon: 'pin' -%}
+          <span class="visually-hidden">{{ 'knr.header.store_locator' | t }}</span>
+        </a>
+      {%- endif -%}
       {% render 'header-search', input_id: 'Search-In-Modal' %}
 
       {%- if shop.customer_accounts_enabled -%}
@@ -550,6 +559,12 @@
       "id": "menu",
       "default": "main-menu",
       "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "url",
+      "id": "store_locator_link",
+      "label": "Store locator link",
+      "info": "Shows a location icon next to search when set."
     },
     {
       "type": "select",

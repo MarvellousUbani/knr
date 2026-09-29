@@ -1,0 +1,125 @@
+/* KNR · Brand story + newsletter */
+
+.knr-brand {
+  padding: 0 0 64px;
+  background: var(--knr-white);
+}
+
+.knr-brand__inner {
+  display: grid;
+  gap: 24px;
+}
+
+.knr-brand__media {
+  aspect-ratio: 342 / 235;
+}
+
+.knr-brand__media img,
+.knr-brand__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.knr-brand__heading {
+  font-size: var(--knr-fs-title);
+  line-height: 1.25;
+}
+
+.knr-brand__heading--desktop {
+  display: none;
+}
+
+.knr-brand__form {
+  margin-top: 40px;
+}
+
+.knr-brand__field {
+  display: grid;
+  gap: 16px;
+}
+
+.knr-brand__input {
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  padding: 0 24px;
+  border: 1px solid var(--knr-sand);
+  border-radius: var(--knr-radius);
+  background: var(--knr-white);
+  color: var(--knr-black);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  box-shadow: none;
+}
+
+.knr-brand__input::placeholder {
+  color: var(--knr-black);
+  opacity: 1;
+}
+
+.knr-brand__input:focus-visible {
+  border-color: var(--knr-black);
+}
+
+.knr-brand__submit {
+  width: 100%;
+}
+
+.knr-brand__message {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.knr-brand__disclaimer {
+  margin-top: 16px;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-brand {
+    padding-bottom: 120px;
+  }
+
+  .knr-brand__inner {
+    grid-template-columns: minmax(0, 680fr) minmax(0, 600fr);
+    align-items: center;
+    column-gap: 40px;
+    padding-right: 80px;
+  }
+
+  .knr-brand__media {
+    aspect-ratio: 680 / 540;
+  }
+
+  .knr-brand__heading {
+    font-size: var(--knr-fs-display);
+    line-height: 1.2;
+  }
+
+  .knr-brand__heading--desktop {
+    display: inline;
+  }
+
+  .knr-brand__heading--mobile {
+    display: none;
+  }
+
+  .knr-brand__field {
+    grid-template-columns: minmax(0, 1fr) 160px;
+    gap: 0;
+    padding: 1px;
+    border: 1px solid var(--knr-sand);
+  }
+
+  .knr-brand__input {
+    border: 0;
+  }
+
+  .knr-brand__submit {
+    min-height: 48px;
+  }
+}

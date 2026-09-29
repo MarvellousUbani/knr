@@ -527,5 +527,48 @@
       "expanded": "ขยายแบบฟอร์มผู้รับบัตรของขวัญแล้ว",
       "collapsed": "ย่อแบบฟอร์มผู้รับบัตรของขวัญแล้ว"
     }
+  },
+  "knr": {
+    "general": {
+      "next": "Next",
+      "previous": "Previous",
+      "slide": "Slide {{ index }} of {{ count }}"
+    },
+    "header": {
+      "store_locator": "Store locator"
+    },
+    "product": {
+      "gallery_label": "{{ title }} images",
+      "zoom": "Open image in full screen",
+      "breadcrumb": "Breadcrumb",
+      "review_count": {
+        "one": "{{ count }} review",
+        "other": "{{ count }} reviews"
+      },
+      "rating_label": "Rated {{ rating }} out of {{ scale }}",
+      "unit_price_per": "per",
+      "quick_add": "Add {{ title }} to cart"
+    },
+    "date": {
+      "weekdays": "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday",
+      "months": "January,February,March,April,May,June,July,August,September,October,November,December"
+    },
+    "testimonials": {
+      "compare_label": "Drag to compare {{ before }} and {{ after }}"
+    },
+    "reviews": {
+      "distribution": "Rating distribution",
+      "bar_label": {
+        "one": "{{ count }} review with {{ stars }} stars",
+        "other": "{{ count }} reviews with {{ stars }} stars"
+      },
+      "stars_option": {
+        "one": "{{ count }} star",
+        "other": "{{ count }} stars"
+      }
+    },
+    "news": {
+      "placeholder_title": "Article title"
+    }
   }
 }

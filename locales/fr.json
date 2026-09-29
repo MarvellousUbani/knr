@@ -539,5 +539,48 @@
       "expanded": "Formulaire de destinataire de carte-cadeau agrandi",
       "collapsed": "Formulaire de destinataire de carte-cadeau réduit"
     }
+  },
+  "knr": {
+    "general": {
+      "next": "Suivant",
+      "previous": "Précédent",
+      "slide": "Diapositive {{ index }} sur {{ count }}"
+    },
+    "header": {
+      "store_locator": "Trouver une boutique"
+    },
+    "product": {
+      "gallery_label": "Images de {{ title }}",
+      "zoom": "Agrandir l'image",
+      "breadcrumb": "Fil d'Ariane",
+      "review_count": {
+        "one": "{{ count }} avis",
+        "other": "{{ count }} avis"
+      },
+      "rating_label": "Noté {{ rating }} sur {{ scale }}",
+      "unit_price_per": "par",
+      "quick_add": "Ajouter {{ title }} au panier"
+    },
+    "date": {
+      "weekdays": "Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi",
+      "months": "janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre"
+    },
+    "testimonials": {
+      "compare_label": "Faites glisser pour comparer {{ before }} et {{ after }}"
+    },
+    "reviews": {
+      "distribution": "Répartition des notes",
+      "bar_label": {
+        "one": "{{ count }} avis à {{ stars }} étoiles",
+        "other": "{{ count }} avis à {{ stars }} étoiles"
+      },
+      "stars_option": {
+        "one": "{{ count }} étoile",
+        "other": "{{ count }} étoiles"
+      }
+    },
+    "news": {
+      "placeholder_title": "Titre de l'article"
+    }
   }
 }

@@ -1,0 +1,52 @@
+{% comment %}
+  Compact product card with a quick-add button, used by "Complétez votre rituel".
+  The "+" button posts through Dawn's <product-form> (assets/product-form.js),
+  so it opens the theme's cart notification / drawer like any other add to cart.
+
+  Accepts:
+  - card_product: {Object} product
+
+  Usage:
+  {% render 'knr-product-card-mini', card_product: product %}
+{% endcomment %}
+{%- assign card_variant = card_product.selected_or_first_available_variant -%}
+<article class="knr-mini-card">
+  <a class="knr-media knr-mini-card__media" href="{{ card_product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if card_product.featured_image -%}
+      {{
+        card_product.featured_image
+        | image_url: width: 480
+        | image_tag: widths: '160, 320, 480', sizes: '159px', loading: 'lazy', alt: ''
+      }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </a>
+
+  {%- if card_variant.available -%}
+    <product-form class="knr-mini-card__form" data-section-id="{{ section.id }}">
+      <div class="product-form__error-message-wrapper knr-visually-hidden" role="alert" hidden>
+        <span class="product-form__error-message"></span>
+      </div>
+      {%- form 'product', card_product, class: 'knr-mini-card__add-form', novalidate: 'novalidate' -%}
+        <input type="hidden" name="id" value="{{ card_variant.id }}" class="product-variant-id">
+        <button
+          type="submit"
+          name="add"
+          class="knr-mini-card__add"
+          aria-label="{{ 'knr.product.quick_add' | t: title: card_product.title | escape }}"
+        >
+          <span>{%- render 'knr-icon', icon: 'plus' -%}</span>
+          {%- render 'loading-spinner' -%}
+        </button>
+      {%- endform -%}
+    </product-form>
+  {%- endif -%}
+
+  <div class="knr-mini-card__meta">
+    <h3 class="knr-mini-card__title">
+      <a href="{{ card_product.url }}">{{ card_product.title | escape }}</a>
+    </h3>
+    <p class="knr-mini-card__price">{{ card_variant.price | money }}</p>
+  </div>
+</article>

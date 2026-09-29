@@ -1,0 +1,195 @@
+/*
+  KNR · Header overrides for the knr-product template only.
+  Loaded by sections/knr-main-product.liquid and scoped with the body class
+  `template-suffix-knr-product`, so every other page keeps Dawn's header.
+
+  - Full-width layout: logo left, menu centered, icons right (desktop)
+  - Logo left, icons + hamburger right (mobile)
+  - Transparent / white over the product hero until the sticky header kicks in
+*/
+
+.template-suffix-knr-product {
+  --knr-header-fg: #fff;
+}
+
+.template-suffix-knr-product .section-header .header {
+  max-width: none;
+  padding: 6px 24px;
+  column-gap: 16px;
+}
+
+.template-suffix-knr-product .header__heading-link {
+  margin-left: 0;
+  padding: 0;
+}
+
+.template-suffix-knr-product .header__heading-link .h2 {
+  font-family: 'KNR Inter', var(--font-body-family);
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+  color: rgb(var(--color-foreground));
+}
+
+.template-suffix-knr-product .header__icons {
+  align-items: center;
+  gap: 4px;
+  padding-right: 0;
+}
+
+.template-suffix-knr-product .header__icon {
+  width: 32px;
+  height: 44px;
+}
+
+.template-suffix-knr-product .header__icon .svg-wrapper,
+.template-suffix-knr-product .header__icon .icon,
+.template-suffix-knr-product .header__icon--locator svg {
+  width: 20px;
+  height: 20px;
+}
+
+.template-suffix-knr-product .cart-count-bubble {
+  top: 7px;
+  right: 1px;
+  bottom: auto;
+  left: auto;
+  width: 11px;
+  height: 11px;
+  font-size: 8px;
+  line-height: 1;
+}
+
+/* Mobile: logo | icons | hamburger */
+@media screen and (max-width: 989px) {
+  .template-suffix-knr-product .section-header .header {
+    grid-template-areas: 'heading icons drawer';
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .template-suffix-knr-product .header__heading,
+  .template-suffix-knr-product .header__heading-link {
+    grid-area: heading;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .template-suffix-knr-product header-drawer {
+    grid-area: drawer;
+    margin: 0 -6px 0 4px;
+  }
+
+  .template-suffix-knr-product .header > .header__search {
+    display: none;
+  }
+
+  .template-suffix-knr-product .header__icons > .header__search {
+    display: inline-flex;
+  }
+
+  .template-suffix-knr-product .header__icon--account {
+    display: none;
+  }
+}
+
+/* Desktop: logo | centered menu | icons */
+@media screen and (min-width: 990px) {
+  .template-suffix-knr-product .section-header .header {
+    grid-template-areas: 'heading navigation icons';
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .template-suffix-knr-product .header__heading-link .h2 {
+    font-size: 22px;
+  }
+
+  .template-suffix-knr-product .header__inline-menu {
+    grid-area: navigation;
+    justify-self: center;
+    margin-top: 0;
+  }
+
+  .template-suffix-knr-product .header__inline-menu .list-menu--inline {
+    gap: 24px;
+  }
+
+  .template-suffix-knr-product .header__menu-item {
+    padding: 8px 0;
+    font-family: 'KNR Inter', var(--font-body-family);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -0.04em;
+    color: rgb(var(--color-foreground));
+  }
+
+  .template-suffix-knr-product .header__menu-item .icon-caret {
+    display: none;
+  }
+
+  .template-suffix-knr-product summary.header__menu-item {
+    padding-right: 0;
+  }
+
+  .template-suffix-knr-product .header__icons {
+    justify-self: end;
+    gap: 0;
+  }
+
+  .template-suffix-knr-product .header__icon {
+    width: 29px;
+  }
+
+  .template-suffix-knr-product .header__icon .svg-wrapper,
+  .template-suffix-knr-product .header__icon .icon,
+  .template-suffix-knr-product .header__icon--locator svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Transparent state over the hero ---------------------------------------- */
+
+.template-suffix-knr-product .section-header:not(.shopify-section-header-sticky):not(:has(details[open])) .header-wrapper {
+  border-bottom: 0;
+  background: transparent;
+}
+
+.template-suffix-knr-product .section-header:not(.shopify-section-header-sticky):not(:has(details[open])) :is(
+    .header__heading-link,
+    .header__heading-link .h2,
+    .header__menu-item,
+    .header__icon,
+    .header__icon--menu
+  ) {
+  color: var(--knr-header-fg);
+}
+
+.template-suffix-knr-product .section-header:not(.shopify-section-header-sticky):not(:has(details[open])) .cart-count-bubble {
+  background: var(--knr-header-fg);
+  color: #000;
+}
+
+/* Announcement bar: 32px black strip with 12px text */
+
+.template-suffix-knr-product .announcement-bar__message {
+  min-height: 32px;
+  padding: 7px 0;
+  font-family: 'KNR Inter', var(--font-body-family);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0;
+}
+
+.template-suffix-knr-product .announcement-bar__link .svg-wrapper {
+  display: none;
+}
+
+.template-suffix-knr-product .announcement-bar__link span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.template-suffix-knr-product .utility-bar {
+  border-bottom: 0;
+}

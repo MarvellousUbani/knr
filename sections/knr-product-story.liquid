@@ -1,0 +1,104 @@
+{{ 'knr-product-story.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_mobile = section.settings.image_mobile | default: image
+-%}
+
+<section
+  class="knr-section knr-story"
+  aria-label="{{ section.settings.eyebrow | default: section.settings.author | escape }}"
+  style="--knr-story-overlay: {{ section.settings.overlay | divided_by: 100.0 }};"
+>
+  <div class="knr-media knr-story__media">
+    {%- if image != blank -%}
+      <picture>
+        <source
+          media="(max-width: 749px)"
+          srcset="
+            {{ image_mobile | image_url: width: 390 }} 390w,
+            {{ image_mobile | image_url: width: 780 }} 780w,
+            {{ image_mobile | image_url: width: 1170 }} 1170w
+          "
+          sizes="100vw"
+        >
+        {{
+          image
+          | image_url: width: 2880
+          | image_tag: widths: '750, 1100, 1440, 1880, 2200, 2880', sizes: '100vw', loading: 'lazy', alt: image.alt
+        }}
+      </picture>
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  <div class="knr-story__content knr-container">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="knr-story__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+
+    <figure class="knr-story__quote">
+      {%- if section.settings.quote != blank -%}
+        <blockquote class="knr-story__text">{{ section.settings.quote }}</blockquote>
+      {%- endif -%}
+      {%- if section.settings.author != blank -%}
+        <figcaption class="knr-story__author">{{ section.settings.author | escape }}</figcaption>
+      {%- endif -%}
+    </figure>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Product story",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image",
+      "info": "Optional art-directed crop for small screens."
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "label": "Image overlay",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Notre engagement pour une beauté régénérée"
+    },
+    {
+      "type": "richtext",
+      "id": "quote",
+      "label": "Quote",
+      "default": "<p>Fusionnant l'huile de rosier muscat, le rétinol végétal et l'extrait de cactus, notre sérum pénètre en profondeur pour stimuler le renouvellement cellulaire, atténuer les rides et redonner à la peau son éclat et sa fermeté naturels.</p>"
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "Author",
+      "default": "Sophie M."
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Product story"
+    }
+  ]
+}
+{% endschema %}

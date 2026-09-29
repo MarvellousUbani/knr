@@ -1,0 +1,24 @@
+{% comment %}
+  Renders a 5-star rating row (decorative; pair it with a text alternative).
+
+  Accepts:
+  - rating: {Number} rating value
+  - scale: {Number} optional max value (default 5)
+  - class: {String} optional extra class
+
+  Usage:
+  {% render 'knr-stars', rating: 4.7 %}
+{% endcomment %}
+{%- liquid
+  assign scale = scale | default: 5
+  assign filled = rating | times: 5.0 | divided_by: scale | round
+-%}
+<span class="knr-stars {{ class }}" aria-hidden="true">
+  {%- for i in (1..5) -%}
+    {%- if i <= filled -%}
+      {%- render 'knr-icon', icon: 'star' -%}
+    {%- else -%}
+      {%- render 'knr-icon', icon: 'star-outline' -%}
+    {%- endif -%}
+  {%- endfor -%}
+</span>

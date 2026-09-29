@@ -1,0 +1,35 @@
+{% comment %}
+  Renders one review row.
+
+  Accepts:
+  - rating: {Number} 1-5
+  - author: {String}
+  - verified: {Boolean}
+  - verified_label: {String}
+  - title: {String}
+  - body: {String} plain text (newlines preserved)
+  - date: {String|Date} optional
+  - attributes: {String} optional extra attributes (theme editor block attributes)
+{% endcomment %}
+{%- assign rating_rounded = rating | round -%}
+<li class="knr-review" data-review data-rating="{{ rating_rounded }}" {{ attributes }}>
+  <div class="knr-review__top">
+    {%- render 'knr-stars', rating: rating -%}
+    <span class="knr-visually-hidden">{{ 'knr.product.rating_label' | t: rating: rating, scale: 5 }}</span>
+    {%- if date != blank -%}
+      <time class="knr-review__date" datetime="{{ date | date: '%Y-%m-%d' }}">{{ date | date: '%d/%m/%y' }}</time>
+    {%- endif -%}
+  </div>
+  <p class="knr-review__author">
+    {{ author | escape }}
+    {%- if verified -%}
+      <span class="knr-review__verified">{{ verified_label | escape }}</span>
+    {%- endif -%}
+  </p>
+  {%- if title != blank -%}
+    <h3 class="knr-review__title">{{ title | escape }}</h3>
+  {%- endif -%}
+  {%- if body != blank -%}
+    <p class="knr-review__body">{{ body | escape | newline_to_br }}</p>
+  {%- endif -%}
+</li>

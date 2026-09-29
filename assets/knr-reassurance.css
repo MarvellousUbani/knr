@@ -1,0 +1,67 @@
+/* KNR · Reassurance strip — 4 columns on desktop, one-at-a-time carousel on mobile. */
+
+.knr-reassurance {
+  padding: 79px 0 80px;
+  background: var(--knr-sand);
+  text-align: center;
+}
+
+.knr-reassurance__inner {
+  display: block;
+}
+
+.knr-reassurance__list {
+  grid-auto-columns: 100%;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knr-reassurance__item {
+  padding-inline: 16px;
+}
+
+.knr-reassurance__title {
+  font-size: 14px;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+
+.knr-reassurance__text {
+  margin-top: 24px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.knr-reassurance__text br {
+  display: none;
+}
+
+.knr-reassurance__dots {
+  margin-top: 18px;
+}
+
+.knr-reassurance__dots button:not([aria-current='true']) {
+  background-color: #b5a282;
+  opacity: 0.6;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-reassurance {
+    padding: 78px 0;
+  }
+
+  .knr-reassurance__list {
+    grid-auto-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
+
+  .knr-reassurance__text br {
+    display: inline;
+  }
+
+  .knr-reassurance__dots {
+    display: none;
+  }
+}

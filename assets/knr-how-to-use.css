@@ -1,0 +1,95 @@
+/* KNR · How to use — 3-up grid on desktop, swipe cards on mobile. */
+
+.knr-howto {
+  padding: 40px 0 64px;
+  background: var(--knr-white);
+}
+
+.knr-howto__inner {
+  display: block;
+}
+
+.knr-howto__heading {
+  margin-bottom: 40px;
+}
+
+.knr-howto__list {
+  grid-auto-columns: 255px;
+  margin: 0;
+  padding: 0 var(--knr-gutter);
+  scroll-padding-inline: var(--knr-gutter);
+  list-style: none;
+}
+
+.knr-howto__media {
+  aspect-ratio: 1;
+}
+
+.knr-howto__media img,
+.knr-howto__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.knr-howto__body {
+  padding: 22px 16px 0;
+}
+
+.knr-howto__index {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.knr-howto__title {
+  margin-top: 14px;
+  font-size: var(--knr-fs-lead);
+  line-height: 32px;
+}
+
+.knr-howto__text {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.knr-howto__link {
+  margin-top: 8px;
+}
+
+.knr-howto__progress {
+  margin-top: 30px;
+}
+
+.knr-howto__inner:not([data-overflowing]) .knr-howto__progress {
+  visibility: hidden;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-howto__list {
+    grid-auto-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
+
+  .knr-howto__progress {
+    display: none;
+  }
+
+  .knr-howto__link {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .knr-howto {
+    padding-bottom: 118px;
+  }
+
+  .knr-howto__heading {
+    margin-bottom: 40px;
+  }
+
+  .knr-howto__body {
+    padding: 22px 24px 0;
+  }
+}
