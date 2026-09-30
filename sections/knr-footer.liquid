@@ -98,7 +98,7 @@
         <localization-form>
           {%- form 'localization', id: 'KnrFooterCountryForm', class: 'localization-form' -%}
             <h2 class="knr-visually-hidden" id="KnrFooterCountryLabel">{{ 'localization.country_label' | t }}</h2>
-            {%- render 'country-localization', localPosition: 'KnrFooterCountry' -%}
+            {%- render 'country-localization', localPosition: 'KnrFooterCountry', label_format: 'compact' -%}
           {%- endform -%}
         </localization-form>
       {%- endif -%}

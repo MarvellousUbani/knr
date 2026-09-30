@@ -397,6 +397,11 @@
   background: var(--knr-ivory);
 }
 
+.knr-media > picture {
+  display: block;
+  height: 100%;
+}
+
 .knr-media > img,
 .knr-media > picture > img {
   width: 100%;

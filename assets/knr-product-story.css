@@ -14,11 +14,21 @@
   background: transparent;
 }
 
+/* Mobile: flat overlay + shade behind the eyebrow (top) and the quote (bottom). */
 .knr-story__media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, var(--knr-story-overlay, 0));
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 22%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.12) 40%, rgba(0, 0, 0, 0) 60%),
+    rgba(0, 0, 0, var(--knr-story-overlay-mobile, 0.16));
+}
+
+@media screen and (min-width: 750px) {
+  .knr-story__media::after {
+    background: rgba(0, 0, 0, var(--knr-story-overlay, 0.1));
+  }
 }
 
 .knr-story__media picture,

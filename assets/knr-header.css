@@ -50,8 +50,8 @@
 
 .template-suffix-knr-product .header__icon .icon,
 .template-suffix-knr-product .header__icon--locator svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Dawn's cart glyph only fills ~half of its 40px viewBox. */
@@ -61,8 +61,8 @@
 }
 
 .template-suffix-knr-product .header__icon--cart .icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
 .template-suffix-knr-product .header__icon--cart .cart-count-bubble {
@@ -216,4 +216,18 @@
 
 .template-suffix-knr-product .utility-bar {
   border-bottom: 0;
+}
+
+/* Two-line menu icon (design) instead of Dawn's three lines. */
+.template-suffix-knr-product details:not([open]) > .header__icon--menu .icon-hamburger {
+  display: none;
+}
+
+.template-suffix-knr-product details:not([open]) > .header__icon--menu > span::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 8px;
+  border-top: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
 }

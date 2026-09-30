@@ -85,7 +85,8 @@
         "messages_interval": 5,
         "complementary_heading": "Complétez votre rituel",
         "complementary_products": [],
-        "enable_sticky_bar": true
+        "enable_sticky_bar": true,
+        "hero_image_mobile": "shopify://shop_images/serum-hero-mobile.jpg"
       }
     },
     "story": {
@@ -93,10 +94,11 @@
       "settings": {
         "image": "shopify://shop_images/story-desktop.jpg",
         "image_mobile": "shopify://shop_images/story-mobile.jpg",
-        "overlay": 0,
+        "overlay": 10,
         "eyebrow": "Notre engagement pour une beauté régénérée",
         "quote": "<p>Fusionnant l'huile de rosier muscat, le rétinol végétal et l'extrait de cactus, notre sérum pénètre en profondeur pour stimuler le renouvellement cellulaire, atténuer les rides et redonner à la peau son éclat et sa fermeté naturels.</p>",
-        "author": "Sophie M."
+        "author": "Sophie M.",
+        "overlay_mobile": 16
       }
     },
     "how_to_use": {
@@ -133,7 +135,11 @@
           }
         }
       },
-      "block_order": ["step_1", "step_2", "step_3"],
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
       "settings": {
         "heading": "How to use"
       }
@@ -166,7 +172,11 @@
           }
         }
       },
-      "block_order": ["quote_1", "quote_2", "quote_3"],
+      "block_order": [
+        "quote_1",
+        "quote_2",
+        "quote_3"
+      ],
       "settings": {
         "heading": "Ce que disent nos clientes",
         "text": "<p>Des transformations visibles dès 4 semaines. Nos clientes témoignent d'une peau visiblement régénérée, plus ferme et lumineuse.</p>",
@@ -215,7 +225,13 @@
           }
         }
       },
-      "block_order": ["faq_1", "faq_2", "faq_3", "faq_4", "faq_5"],
+      "block_order": [
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5"
+      ],
       "settings": {
         "heading": "Questions fréquentes",
         "metafield": "custom.faq",
@@ -270,7 +286,12 @@
           }
         }
       },
-      "block_order": ["review_1", "review_2", "review_3", "review_4"],
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3",
+        "review_4"
+      ],
       "settings": {
         "heading": "Avis clients",
         "anchor": "avis",
@@ -309,5 +330,14 @@
       }
     }
   },
-  "order": ["main", "story", "how_to_use", "testimonials", "faq", "reviews", "latest_news", "brand_story"]
+  "order": [
+    "main",
+    "story",
+    "how_to_use",
+    "testimonials",
+    "faq",
+    "reviews",
+    "latest_news",
+    "brand_story"
+  ]
 }

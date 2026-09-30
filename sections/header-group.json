@@ -13,7 +13,9 @@
           }
         }
       },
-      "block_order": ["announcement-bar-0"],
+      "block_order": [
+        "announcement-bar-0"
+      ],
       "settings": {
         "auto_rotate": false,
         "change_slides_speed": 5,
@@ -30,7 +32,7 @@
         "logo_position": "middle-left",
         "mobile_logo_position": "left",
         "menu": "main-menu",
-        "store_locator_link": "",
+        "store_locator_link": "shopify://pages/contact",
         "menu_type_desktop": "dropdown",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": false,
@@ -44,5 +46,8 @@
       }
     }
   },
-  "order": ["announcement-bar", "header"]
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
 }

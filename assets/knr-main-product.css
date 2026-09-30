@@ -928,3 +928,10 @@
     margin-right: 0;
   }
 }
+
+/* While Dawn fetches the selected variant, keep the button looking active. */
+.knr-product.is-switching .product-form__submit[disabled],
+.knr-product.is-switching .knr-sticky__submit[disabled] {
+  opacity: 1;
+  cursor: progress;
+}

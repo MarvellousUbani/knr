@@ -110,21 +110,54 @@
   gap: 24px;
 }
 
-.knr-footer__localization :is(.localization-form, .disclosure) {
+.knr-footer__localization :is(localization-form, .localization-form, .disclosure) {
   margin: 0;
   padding: 0;
 }
 
-.knr-footer__localization .disclosure__button {
+/* Dawn's selector is styled as a boxed form field; the design wants a plain label + chevron. */
+.knr-footer__localization .disclosure__button.localization-form__select {
+  width: auto;
+  min-width: 0;
   min-height: 0;
   height: auto;
   margin: 0;
-  padding: 0 20px 0 0;
+  padding: 0 18px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   color: var(--knr-black);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: inherit;
   text-decoration: none;
+}
+
+.knr-footer__localization .localization-form__select::before,
+.knr-footer__localization .localization-form__select::after {
+  content: none;
+}
+
+.knr-footer__localization .localization-form__select:hover span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.knr-footer__localization .localization-form__select .icon-caret {
+  top: 50%;
+  right: 0;
+  width: 10px;
+  height: 6px;
+  transform: translateY(-50%);
+}
+
+.knr-footer__localization .localization-form__select[aria-expanded='true'] .icon-caret {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.knr-footer__localization .disclosure__list-wrapper {
+  text-align: left;
 }
 
 .knr-footer__copyright {

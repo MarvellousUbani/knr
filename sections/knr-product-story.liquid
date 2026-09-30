@@ -14,7 +14,7 @@
 <section
   class="knr-section knr-story"
   aria-label="{{ section.settings.eyebrow | default: section.settings.author | escape }}"
-  style="--knr-story-overlay: {{ section.settings.overlay | divided_by: 100.0 }};"
+  style="--knr-story-overlay: {{ section.settings.overlay | divided_by: 100.0 }}; --knr-story-overlay-mobile: {{ section.settings.overlay_mobile | divided_by: 100.0 }};"
 >
   <div class="knr-media knr-story__media">
     {%- if image != blank -%}
@@ -75,12 +75,23 @@
     {
       "type": "range",
       "id": "overlay",
-      "label": "Image overlay",
+      "label": "Image overlay (desktop)",
       "min": 0,
       "max": 60,
-      "step": 5,
+      "step": 2,
       "unit": "%",
-      "default": 0
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "overlay_mobile",
+      "label": "Image overlay (mobile)",
+      "info": "Mobile also adds a soft shade behind the text.",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "%",
+      "default": 16
     },
     {
       "type": "text",

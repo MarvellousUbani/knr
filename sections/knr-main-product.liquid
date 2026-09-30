@@ -117,6 +117,19 @@
             data-media-id="{{ section.id }}-{{ media.id }}"
           >
             <div class="knr-media knr-gallery__media">
+              {%- if is_hero and section.settings.hero_image_mobile != blank -%}
+                {%- assign hero_mobile = section.settings.hero_image_mobile -%}
+                <picture>
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {{ hero_mobile | image_url: width: 390 }} 390w,
+                      {{ hero_mobile | image_url: width: 780 }} 780w,
+                      {{ hero_mobile | image_url: width: 1170 }} 1170w
+                    "
+                    sizes="100vw"
+                  >
+              {%- endif -%}
               {{
                 media.preview_image
                 | image_url: width: 2880
@@ -128,6 +141,9 @@
                   alt: media.alt,
                   style: media_style
               }}
+              {%- if is_hero and section.settings.hero_image_mobile != blank -%}
+                </picture>
+              {%- endif -%}
             </div>
 
             {%- unless is_hero -%}
@@ -483,6 +499,12 @@
       "max": 7,
       "step": 2,
       "default": 3
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Mobile hero image",
+      "info": "Optional art-directed crop of the first product image for phones (portrait, ~390:435)."
     },
     {
       "type": "header",

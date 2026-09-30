@@ -3,6 +3,7 @@
 
   Accepts:
     - localPosition: pass in the position in which the form is coming up to create specific IDs
+    - label_format: optional, 'compact' renders "France (€)" (used by the KNR footer)
 {%- endcomment -%}
 
 {%- liquid
@@ -34,9 +35,13 @@
     aria-describedby="{{ localPosition }}Label"
   >
     <span>
-      {{- localization.country.name }} |
-      {{ localization.country.currency.iso_code }}
-      {{ localization.country.currency.symbol -}}
+      {%- if label_format == 'compact' -%}
+        {{- localization.country.name }} ({{ localization.country.currency.symbol }})
+      {%- else -%}
+        {{- localization.country.name }} |
+        {{ localization.country.currency.iso_code }}
+        {{ localization.country.currency.symbol -}}
+      {%- endif -%}
     </span>
     {{ 'icon-caret.svg' | inline_asset_content }}
   </button>

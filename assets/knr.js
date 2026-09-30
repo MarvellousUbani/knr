@@ -159,10 +159,23 @@
       this.hidden = false;
       this.setVisible(false);
 
-      this.observer = new IntersectionObserver(([entry]) => {
-        this.setVisible(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      // Visible once the main button has scrolled away, hidden again over the footer.
+      this.pastButton = false;
+      this.overFooter = false;
+      const update = () => this.setVisible(this.pastButton && !this.overFooter);
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === this.mainButton) {
+            this.pastButton = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+          } else {
+            this.overFooter = entry.isIntersecting;
+          }
+        });
+        update();
       });
       this.observer.observe(this.mainButton);
+      const footer = document.querySelector('.shopify-section-group-footer-group, footer');
+      if (footer) this.observer.observe(footer);
 
       this.addEventListener('click', (event) => {
         const option = event.target.closest('[data-option-value]');
@@ -209,6 +222,24 @@
     }
   }
   define('knr-sticky-atc', KnrStickyAtc);
+
+  /* Variant switching: Dawn disables the add-to-cart button while it fetches the
+     new variant. Flag that state so the button doesn't flash its sold-out style. */
+  if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
+    let switchTimer;
+    const setSwitching = (on) => {
+      document.querySelectorAll('.knr-product').forEach((el) => el.classList.toggle('is-switching', on));
+    };
+    subscribe(PUB_SUB_EVENTS.optionValueSelectionChange, () => {
+      setSwitching(true);
+      window.clearTimeout(switchTimer);
+      switchTimer = window.setTimeout(() => setSwitching(false), 4000);
+    });
+    subscribe(PUB_SUB_EVENTS.variantChange, () => {
+      window.clearTimeout(switchTimer);
+      setSwitching(false);
+    });
+  }
 
   /* Before / after comparison driven by a native (accessible) range input. */
   class KnrBeforeAfter extends HTMLElement {
