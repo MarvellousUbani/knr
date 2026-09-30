@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -73,6 +82,7 @@
       ],
       "settings": {
         "desktop_media_count": 3,
+        "hero_image_mobile": "shopify://shop_images/serum-hero-mobile.jpg",
         "show_breadcrumb": true,
         "picker_type": "button",
         "swatch_shape": "none",
@@ -85,8 +95,7 @@
         "messages_interval": 5,
         "complementary_heading": "Complétez votre rituel",
         "complementary_products": [],
-        "enable_sticky_bar": true,
-        "hero_image_mobile": "shopify://shop_images/serum-hero-mobile.jpg"
+        "enable_sticky_bar": true
       }
     },
     "story": {
@@ -95,10 +104,10 @@
         "image": "shopify://shop_images/story-desktop.jpg",
         "image_mobile": "shopify://shop_images/story-mobile.jpg",
         "overlay": 10,
+        "overlay_mobile": 16,
         "eyebrow": "Notre engagement pour une beauté régénérée",
         "quote": "<p>Fusionnant l'huile de rosier muscat, le rétinol végétal et l'extrait de cactus, notre sérum pénètre en profondeur pour stimuler le renouvellement cellulaire, atténuer les rides et redonner à la peau son éclat et sa fermeté naturels.</p>",
-        "author": "Sophie M.",
-        "overlay_mobile": 16
+        "author": "Sophie M."
       }
     },
     "how_to_use": {
