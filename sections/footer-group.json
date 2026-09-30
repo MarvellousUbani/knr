@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "name": "t:sections.footer.name",
   "type": "footer",
@@ -34,7 +43,12 @@
           }
         }
       },
-      "block_order": ["shipping", "returns", "payment", "service"],
+      "block_order": [
+        "shipping",
+        "returns",
+        "payment",
+        "service"
+      ],
       "settings": {
         "label": "Nos engagements"
       }
@@ -46,7 +60,7 @@
           "type": "menu",
           "settings": {
             "heading": "Découvrir",
-            "menu": "footer-decouvrir"
+            "menu": "footer"
           }
         },
         "menu_service": {
@@ -75,7 +89,12 @@
           }
         }
       },
-      "block_order": ["menu_discover", "menu_service", "menu_legal", "about"],
+      "block_order": [
+        "menu_discover",
+        "menu_service",
+        "menu_legal",
+        "about"
+      ],
       "settings": {
         "wordmark_text": "maison célestine",
         "copyright": "© [year] Maison Célestine. Tous droits réservés.",
@@ -85,5 +104,8 @@
       }
     }
   },
-  "order": ["reassurance", "footer"]
+  "order": [
+    "reassurance",
+    "footer"
+  ]
 }
