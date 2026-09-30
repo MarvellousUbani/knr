@@ -3,11 +3,17 @@
   1. Product metafield (list of `product_review` metaobjects), key set in settings
      (default custom.reviews). Fields: author, verified, title, body, rating, date
   2. Section blocks (manual reviews)
-  Summary uses the standard review metafields (reviews.rating / reviews.rating_count)
+  Summary uses custom.rating / custom.rating_count (falling back to reviews.rating / reviews.rating_count)
   when present, otherwise it is computed from the listed reviews.
 {% endcomment %}
 
 {{ 'knr-reviews.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
 
 {%- liquid
   assign review_items = blank
@@ -69,11 +75,16 @@
     assign total = total | plus: 1
   endfor
 
-  assign average = product.metafields.reviews.rating.value.rating
+  assign rating_source = product.metafields.custom.rating | default: product.metafields.reviews.rating
+  if rating_source.type == 'rating'
+    assign average = rating_source.value.rating
+  else
+    assign average = rating_source.value
+  endif
   if average == blank and total > 0
     assign average = rating_sum | times: 1.0 | divided_by: total | round: 1
   endif
-  assign review_count = product.metafields.reviews.rating_count.value | default: total
+  assign review_count = product.metafields.custom.rating_count.value | default: product.metafields.reviews.rating_count.value | default: total
   assign review_count_label = section.settings.based_on_label | replace: '[count]', review_count
 -%}
 
@@ -83,9 +94,9 @@
   aria-labelledby="KnrReviews-{{ section.id }}"
 >
   <knr-reviews class="knr-reviews__inner knr-container" data-page-size="{{ section.settings.page_size }}">
-    <h2 id="KnrReviews-{{ section.id }}" class="knr-reviews__heading">{{ section.settings.heading | escape }}</h2>
+    <h2 id="KnrReviews-{{ section.id }}" class="knr-reviews__heading{{ reveal }}">{{ section.settings.heading | escape }}</h2>
 
-    <div class="knr-reviews__summary">
+    <div class="knr-reviews__summary{{ reveal }}">
       {%- if average != blank -%}
         <div class="knr-reviews__score">
           <p class="knr-reviews__average">

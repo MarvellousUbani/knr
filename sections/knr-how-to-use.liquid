@@ -1,14 +1,25 @@
 {{ 'knr-how-to-use.css' | asset_url | stylesheet_tag }}
 
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
 <section class="knr-section knr-howto" aria-labelledby="KnrHowto-{{ section.id }}">
   <knr-scroller class="knr-howto__inner">
-    <h2 id="KnrHowto-{{ section.id }}" class="knr-howto__heading knr-heading-title knr-container">
+    <h2 id="KnrHowto-{{ section.id }}" class="knr-howto__heading knr-heading-title knr-container{{ reveal }}">
       {{- section.settings.heading | escape -}}
     </h2>
 
     <ol class="knr-scroller knr-howto__list" role="list" data-scroller-track>
       {%- for block in section.blocks -%}
-        <li class="knr-howto__step" {{ block.shopify_attributes }}>
+        <li
+          class="knr-howto__step{{ reveal }}"
+          data-cascade
+          style="--animation-order: {{ forloop.index }};"
+          {{ block.shopify_attributes }}
+        >
           <div class="knr-media knr-howto__media">
             {%- if block.settings.image != blank -%}
               {{

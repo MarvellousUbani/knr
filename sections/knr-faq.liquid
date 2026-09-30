@@ -8,6 +8,12 @@
 {{ 'knr-faq.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
   assign faq_items = blank
   if product and section.settings.metafield != blank
     assign metafield_parts = section.settings.metafield | split: '.'
@@ -17,9 +23,9 @@
 
 <section class="knr-section knr-faq" aria-labelledby="KnrFaq-{{ section.id }}">
   <div class="knr-faq__inner knr-container">
-    <h2 id="KnrFaq-{{ section.id }}" class="knr-faq__heading">{{ section.settings.heading | escape }}</h2>
+    <h2 id="KnrFaq-{{ section.id }}" class="knr-faq__heading{{ reveal }}">{{ section.settings.heading | escape }}</h2>
 
-    <div class="knr-faq__list">
+    <div class="knr-faq__list{{ reveal }}">
       {%- if faq_items.size > 0 -%}
         {%- for item in faq_items -%}
           <details class="knr-accordion knr-faq__item"{% if forloop.first and section.settings.open_first %} open{% endif %}>

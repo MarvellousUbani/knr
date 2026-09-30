@@ -15,7 +15,7 @@ A dedicated product template (`templates/product.knr-product.json`) for **Sérum
 | `knr-how-to-use` | Blocks: image, title, text, link |
 | `knr-testimonials` | Settings for the before/after images; blocks for the quotes |
 | `knr-faq` | Product metafield `custom.faq` (metaobjects), falling back to section blocks |
-| `knr-reviews` | Product metafield `custom.reviews` (metaobjects), falling back to blocks; `reviews.rating` / `reviews.rating_count` |
+| `knr-reviews` | Product metafield `custom.reviews` (metaobjects), falling back to blocks; `custom.rating` / `custom.rating_count` (fallback: `reviews.*`) |
 | `knr-latest-news` | A blog chosen in the settings (real `article` objects) |
 | `knr-brand-story` | Settings plus the native `customer` newsletter form |
 | `knr-reassurance`, `knr-footer` | Footer group: blocks, Shopify menus, social settings, localization |
@@ -28,6 +28,8 @@ A dedicated product template (`templates/product.knr-product.json`) for **Sérum
 The sticky bar and the "Complétez votre rituel" quick-add buttons go through the same Dawn form and events. No variant logic is duplicated.
 
 **JS** (`assets/knr.js`, deferred, about 5 KB): the scroller/progress bar, the product gallery (it follows the variant image), the rotator, the sticky add-to-cart bar (mirrors the picker and listens to `PUB_SUB_EVENTS.variantChange`), the before/after slider (a native `input[type=range]`, so it's keyboard-accessible), the review filter and load-more, and the footer accordions.
+
+**Motion.** Scroll reveals reuse Dawn's `scroll-trigger` / `animations.js` (theme setting "Reveal sections on scroll", staggered with `data-cascade`). Image hover zoom, smooth accordions (`::details-content` + `interpolate-size`, a progressive enhancement) and rotator fades are CSS-only. All motion is disabled under `prefers-reduced-motion`.
 
 **CSS scoping.** Styles live under `.knr-*` classes. Header tweaks (transparent over the hero, centred menu, mobile layout) apply only on this template, through the body class `template-suffix-knr-product`.
 
@@ -60,7 +62,7 @@ Upload everything in `design/export/sections/` and `design/export/blog/`, keepin
 | `custom.faq` | List of metaobjects (`faq_item`) | Optional; overrides the FAQ blocks |
 | `custom.reviews` | List of metaobjects (`product_review`) | Optional; overrides the review blocks |
 | `custom.complementary_products` | List of products | Only if the Search & Discovery app isn't used |
-| `reviews.rating` / `reviews.rating_count` | Rating / Integer (standard definitions) | Stars, "4.7 · 200 avis" |
+| `custom.rating` / `custom.rating_count` | Rating (or decimal) / Integer | Stars, "4.7 · 200 avis" (falls back to the standard `reviews.*` fields) |
 
 ### 4. Products
 **Sérum Précieux Régénérant**

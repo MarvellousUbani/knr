@@ -1,14 +1,20 @@
 {{ 'knr-latest-news.css' | asset_url | stylesheet_tag }}
 
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
 {%- assign news_blog = section.settings.blog | default: blogs.news -%}
 
 <section class="knr-section knr-news" aria-labelledby="KnrNews-{{ section.id }}">
   <knr-scroller class="knr-news__inner">
-    <h2 id="KnrNews-{{ section.id }}" class="knr-news__heading knr-heading-title">{{ section.settings.heading | escape }}</h2>
+    <h2 id="KnrNews-{{ section.id }}" class="knr-news__heading knr-heading-title{{ reveal }}">{{ section.settings.heading | escape }}</h2>
 
     <ul class="knr-scroller knr-news__list" role="list" data-scroller-track>
       {%- for article in news_blog.articles limit: section.settings.articles_count -%}
-        <li class="knr-news__item">
+        <li class="knr-news__item{{ reveal }}" data-cascade style="--animation-order: {{ forloop.index }};">
           <article class="knr-news__card">
             <a class="knr-media knr-news__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
               {%- if article.image -%}

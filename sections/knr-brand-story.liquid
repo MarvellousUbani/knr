@@ -1,6 +1,12 @@
 {{ 'knr-brand-story.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
   assign image = section.settings.image
   assign heading_mobile = section.settings.heading_mobile | default: section.settings.heading
   assign newsletter_form_id = 'KnrNewsletter-' | append: section.id
@@ -8,7 +14,7 @@
 
 <section class="knr-section knr-brand" aria-labelledby="KnrBrand-{{ section.id }}">
   <div class="knr-brand__inner knr-container">
-    <div class="knr-media knr-brand__media">
+    <div class="knr-media knr-brand__media{{ reveal }}">
       {%- if image != blank -%}
         {{
           image
@@ -24,7 +30,7 @@
       {%- endif -%}
     </div>
 
-    <div class="knr-brand__content">
+    <div class="knr-brand__content{{ reveal }}">
       <h2 id="KnrBrand-{{ section.id }}" class="knr-brand__heading">
         <span class="knr-brand__heading--desktop">{{ section.settings.heading | escape }}</span>
         <span class="knr-brand__heading--mobile">{{ heading_mobile | escape }}</span>

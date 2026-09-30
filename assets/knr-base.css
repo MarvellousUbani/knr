@@ -178,8 +178,21 @@
   margin-top: 1em;
 }
 
+/* Pasted content often uses one <div> per line: treat those as lines, not paragraphs. */
+.knr-rte > div + div {
+  margin-top: 0;
+}
+
 .knr-rte a {
   text-underline-offset: 3px;
+}
+
+/* Guard against rich text pasted from Word/Docs carrying inline fonts. */
+.knr-rte [style] {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
 }
 
 /* Buttons ----------------------------------------------------------------- */
@@ -396,5 +409,87 @@
   .knr-footer * {
     scroll-behavior: auto !important;
     transition: none !important;
+  }
+}
+
+/* Motion ------------------------------------------------------------------
+   Scroll reveals use Dawn's `scroll-trigger` system (theme setting
+   "Reveal sections on scroll"). Everything below is CSS-only and skipped for
+   visitors who prefer reduced motion. */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cards inside mobile swipe carousels stay visible (same as Dawn sliders). */
+  @media screen and (max-width: 749px) {
+    .knr-scroller > .scroll-trigger.animate--slide-in {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Slow image zoom on hover (pointer devices only). */
+  @media (hover: hover) {
+    .knr-howto__media img,
+    .knr-news__media img,
+    .knr-mini-card__media img,
+    .knr-gallery__item:not(.knr-gallery__item--hero) .knr-gallery__media img {
+      transition: transform 1.2s cubic-bezier(0.2, 0.6, 0.2, 1);
+    }
+
+    .knr-howto__step:hover .knr-howto__media img,
+    .knr-news__card:hover .knr-news__media img,
+    .knr-mini-card:hover .knr-mini-card__media img,
+    .knr-gallery__item:not(.knr-gallery__item--hero):hover .knr-gallery__media img {
+      transform: scale(1.04);
+    }
+  }
+
+  /* Smooth accordion height (progressive enhancement). */
+  @supports (interpolate-size: allow-keywords) {
+    .knr-accordion {
+      interpolate-size: allow-keywords;
+    }
+
+    .knr-accordion::details-content {
+      height: 0;
+      overflow: clip;
+      transition: height 0.35s cubic-bezier(0.2, 0.6, 0.2, 1), content-visibility 0.35s allow-discrete;
+    }
+
+    .knr-accordion[open]::details-content {
+      height: auto;
+    }
+  }
+
+  /* Rotating messages / quotes fade in. */
+  [data-rotator-slide]:not([hidden]) {
+    animation: knr-fade-in 0.5s ease both;
+  }
+
+  .knr-link,
+  .knr-footer__links a,
+  .knr-mini-card__add,
+  .knr-icon-button {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .knr-link:hover,
+  .knr-icon-button:not([disabled]):hover {
+    opacity: 0.6;
+  }
+
+  .knr-mini-card__add:hover {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes knr-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

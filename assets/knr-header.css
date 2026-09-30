@@ -43,11 +43,31 @@
   height: 44px;
 }
 
-.template-suffix-knr-product .header__icon .svg-wrapper,
+.template-suffix-knr-product .header__icon .svg-wrapper {
+  width: auto;
+  height: auto;
+}
+
 .template-suffix-knr-product .header__icon .icon,
 .template-suffix-knr-product .header__icon--locator svg {
   width: 20px;
   height: 20px;
+}
+
+/* Dawn's cart glyph only fills ~half of its 40px viewBox. */
+.template-suffix-knr-product .header__icon--cart {
+  width: 36px;
+  margin-right: 0;
+}
+
+.template-suffix-knr-product .header__icon--cart .icon {
+  width: 40px;
+  height: 40px;
+}
+
+.template-suffix-knr-product .header__icon--cart .cart-count-bubble {
+  top: 9px;
+  right: 5px;
 }
 
 .template-suffix-knr-product .cart-count-bubble {
@@ -140,11 +160,15 @@
     width: 29px;
   }
 
-  .template-suffix-knr-product .header__icon .svg-wrapper,
   .template-suffix-knr-product .header__icon .icon,
   .template-suffix-knr-product .header__icon--locator svg {
     width: 18px;
     height: 18px;
+  }
+
+  .template-suffix-knr-product .header__icon--cart .icon {
+    width: 36px;
+    height: 36px;
   }
 }
 

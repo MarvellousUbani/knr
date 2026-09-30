@@ -21,9 +21,17 @@
   assign product_form_id = 'product-form-' | append: section.id
   assign desktop_media_count = section.settings.desktop_media_count
 
-  assign rating_value = product.metafields.reviews.rating.value.rating
-  assign rating_scale = product.metafields.reviews.rating.value.scale_max | default: 5
-  assign rating_count = product.metafields.reviews.rating_count.value
+  # Rating: custom.rating / custom.rating_count, falling back to the standard reviews.* fields.
+  # custom.rating may be a Rating or a plain number metafield.
+  assign rating_source = product.metafields.custom.rating | default: product.metafields.reviews.rating
+  if rating_source.type == 'rating'
+    assign rating_value = rating_source.value.rating
+    assign rating_scale = rating_source.value.scale_max | default: 5 | round
+  else
+    assign rating_value = rating_source.value
+    assign rating_scale = 5
+  endif
+  assign rating_count = product.metafields.custom.rating_count.value | default: product.metafields.reviews.rating_count.value
 
   assign badges = product.metafields.custom.badges.value
   if badges == blank

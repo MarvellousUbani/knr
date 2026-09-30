@@ -1,13 +1,19 @@
 {{ 'knr-testimonials.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
   assign before_image = section.settings.before_image
   assign after_image = section.settings.after_image
   assign quote_count = section.blocks.size
 -%}
 
 <section class="knr-section knr-testimonials" aria-labelledby="KnrTestimonials-{{ section.id }}">
-  <div class="knr-testimonials__intro knr-container">
+  <div class="knr-testimonials__intro knr-container{{ reveal }}">
     <h2 id="KnrTestimonials-{{ section.id }}" class="knr-testimonials__heading">
       {{- section.settings.heading | escape -}}
     </h2>
@@ -17,7 +23,7 @@
   </div>
 
   {%- if before_image != blank and after_image != blank -%}
-    <div class="knr-testimonials__compare-wrapper">
+    <div class="knr-testimonials__compare-wrapper{{ reveal }}">
       <knr-before-after class="knr-compare" style="--knr-ba-pos: 50%;">
         <div class="knr-compare__image knr-compare__image--after">
           {{
@@ -66,7 +72,7 @@
   {%- endif -%}
 
   {%- if quote_count > 0 -%}
-    <knr-rotator class="knr-testimonials__quotes knr-container">
+    <knr-rotator class="knr-testimonials__quotes knr-container{{ reveal }}">
       <div class="knr-testimonials__viewport" aria-live="polite">
         {%- for block in section.blocks -%}
           <figure

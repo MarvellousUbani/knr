@@ -1,6 +1,12 @@
 {{ 'knr-product-story.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
   assign image = section.settings.image
   assign image_mobile = section.settings.image_mobile | default: image
 -%}
@@ -35,10 +41,10 @@
 
   <div class="knr-story__content knr-container">
     {%- if section.settings.eyebrow != blank -%}
-      <p class="knr-story__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      <p class="knr-story__eyebrow{{ reveal }}">{{ section.settings.eyebrow | escape }}</p>
     {%- endif -%}
 
-    <figure class="knr-story__quote">
+    <figure class="knr-story__quote{{ reveal }}">
       {%- if section.settings.quote != blank -%}
         <blockquote class="knr-story__text">{{ section.settings.quote }}</blockquote>
       {%- endif -%}
