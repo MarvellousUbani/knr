@@ -1,0 +1,78 @@
+{% comment %}
+  Sample picker panel (slides over the drawer). Selection is local until
+  "Valider votre choix"; assets/knr-cart-rewards.js then syncs the cart in one go.
+
+  Accepts:
+  - samples_collection: {Collection}
+  - samples_max: {Number}
+  - sample_ids: {String} ",id,id," list of sample variant ids
+{% endcomment %}
+{%- liquid
+  assign selected = ''
+  for item in cart.items
+    assign needle = ',' | append: item.variant_id | append: ','
+    if item.properties['_knr_reward'] == 'sample' or sample_ids contains needle
+      assign selected = selected | append: item.variant_id | append: ','
+    endif
+  endfor
+-%}
+<div
+  class="knr-picker"
+  id="KnrSamplePicker"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="KnrSamplePicker-Title"
+  data-max="{{ samples_max }}"
+  data-selected="{{ selected }}"
+  hidden
+>
+  <div class="knr-picker__header">
+    <button type="button" class="knr-picker__back" data-knr-picker-close>
+      {%- render 'knr-cart-icon', icon: 'back' -%}
+      <span class="knr-visually-hidden">{{ 'knr.general.previous' | t }}</span>
+    </button>
+    <h2 id="KnrSamplePicker-Title" class="knr-picker__title">{{ settings.knr_rewards_picker_title | escape }}</h2>
+    <p class="knr-picker__count" aria-live="polite">
+      <span data-knr-picker-count>0</span>/{{ samples_max }}
+    </p>
+  </div>
+
+  <ul class="knr-picker__grid" role="list">
+    {%- for sample in samples_collection.products limit: 50 -%}
+      {%- assign variant = sample.selected_or_first_available_variant -%}
+      {%- if variant.price != 0 -%}{%- continue -%}{%- endif -%}
+      <li class="knr-picker__card{% unless variant.available %} is-unavailable{% endunless %}">
+        <div class="knr-picker__media">
+          {%- if sample.featured_image -%}
+            {{ sample.featured_image | image_url: width: 330 | image_tag: loading: 'lazy', alt: '', widths: '165, 330' }}
+          {%- endif -%}
+        </div>
+        <p class="knr-picker__name">{{ sample.title | escape }}</p>
+        {%- unless sample.has_only_default_variant -%}
+          <p class="knr-picker__variant">{{ variant.title | escape }}</p>
+        {%- endunless -%}
+        <button
+          type="button"
+          class="knr-picker__toggle"
+          data-knr-sample="{{ variant.id }}"
+          aria-pressed="false"
+          {% unless variant.available %}
+            disabled
+          {% endunless %}
+        >
+          <span class="knr-picker__add">{{ settings.knr_rewards_picker_add | escape }}</span>
+          <span class="knr-picker__remove">{{ settings.knr_rewards_picker_remove | escape }}</span>
+          <span class="knr-visually-hidden">{{ sample.title | escape }}</span>
+        </button>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <div class="knr-picker__footer">
+    <button type="button" class="knr-cart__cta" data-knr-picker-submit>
+      {{- settings.knr_rewards_picker_submit | escape }}
+      <span class="knr-cart__cta-sep" aria-hidden="true">|</span>
+      <span><span data-knr-picker-count>0</span>/{{ samples_max }}</span>
+    </button>
+  </div>
+</div>

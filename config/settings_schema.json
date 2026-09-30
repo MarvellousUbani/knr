@@ -1466,5 +1466,227 @@
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
       }
     ]
+  },
+  {
+    "name": "KNR · Récompenses panier",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Barre de progression, échantillons offerts et produit offert dans le panier coulissant. Passez le type de panier sur « Tiroir » (Panier)."
+      },
+      {
+        "type": "checkbox",
+        "id": "knr_rewards_enabled",
+        "label": "Activer les récompenses panier",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Paliers"
+      },
+      {
+        "type": "number",
+        "id": "knr_rewards_threshold_shipping",
+        "label": "Palier 1 — livraison offerte (€)",
+        "default": 50
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_label_shipping",
+        "label": "Libellé palier 1",
+        "default": "Livraison offerte"
+      },
+      {
+        "type": "number",
+        "id": "knr_rewards_threshold_samples",
+        "label": "Palier 2 — échantillons offerts (€)",
+        "default": 75
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_label_samples",
+        "label": "Libellé palier 2",
+        "info": "[count] = nombre d'échantillons.",
+        "default": "[count] échantillons offerts"
+      },
+      {
+        "type": "number",
+        "id": "knr_rewards_threshold_gift",
+        "label": "Palier 3 — produit offert (€)",
+        "default": 100
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_label_gift",
+        "label": "Libellé palier 3",
+        "default": "1 produit offert"
+      },
+      {
+        "type": "header",
+        "content": "Messages"
+      },
+      {
+        "type": "paragraph",
+        "content": "[amount] = montant restant, [count] = nombre d'échantillons."
+      },
+      {
+        "type": "inline_richtext",
+        "id": "knr_rewards_msg_shipping",
+        "label": "Avant le palier 1",
+        "default": "Plus que [amount] pour bénéficier de <b>la livraison offerte</b>"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "knr_rewards_msg_samples",
+        "label": "Avant le palier 2",
+        "default": "Livraison offerte ! Plus que [amount] pour <b>[count] échantillons offerts</b>"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "knr_rewards_msg_gift",
+        "label": "Avant le palier 3",
+        "default": "Échantillons débloqués ! Plus que [amount] pour <b>un produit offert</b>"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "knr_rewards_msg_complete",
+        "label": "Tous les paliers atteints",
+        "default": "Bravo, vous bénéficiez de tous vos cadeaux !"
+      },
+      {
+        "type": "header",
+        "content": "Échantillons"
+      },
+      {
+        "type": "collection",
+        "id": "knr_rewards_samples_collection",
+        "label": "Collection d'échantillons",
+        "info": "Produits à 0 €, statut « Non répertorié » conseillé."
+      },
+      {
+        "type": "range",
+        "id": "knr_rewards_samples_max",
+        "label": "Nombre maximum d'échantillons",
+        "min": 1,
+        "max": 6,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_samples_heading",
+        "label": "Titre du bloc",
+        "default": "Choisissez vos échantillons offerts"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_samples_subheading",
+        "label": "Sous-titre du bloc",
+        "default": "[count] échantillons offerts."
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_samples_choose",
+        "label": "Bouton choisir",
+        "default": "Choisir"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_samples_edit",
+        "label": "Bouton modifier",
+        "default": "Modifier"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_picker_title",
+        "label": "Titre du sélecteur",
+        "default": "Échantillons"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_picker_add",
+        "label": "Lien ajouter",
+        "default": "Ajouter"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_picker_remove",
+        "label": "Lien retirer",
+        "default": "Retirer"
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_picker_submit",
+        "label": "Bouton valider",
+        "default": "Valider votre choix"
+      },
+      {
+        "type": "header",
+        "content": "Produit offert"
+      },
+      {
+        "type": "product",
+        "id": "knr_rewards_gift_product",
+        "label": "Produit offert",
+        "info": "Produit à 0 €, ajouté et retiré automatiquement."
+      },
+      {
+        "type": "text",
+        "id": "knr_rewards_gift_badge",
+        "label": "Mention prix",
+        "default": "Offert"
+      },
+      {
+        "type": "header",
+        "content": "Panier"
+      },
+      {
+        "type": "text",
+        "id": "knr_cart_title",
+        "label": "Titre du panier",
+        "default": "Votre panier"
+      },
+      {
+        "type": "text",
+        "id": "knr_cart_cta",
+        "label": "Bouton principal",
+        "default": "Voir mon panier"
+      },
+      {
+        "type": "select",
+        "id": "knr_cart_cta_target",
+        "label": "Destination du bouton",
+        "options": [
+          {
+            "value": "cart",
+            "label": "Page panier"
+          },
+          {
+            "value": "checkout",
+            "label": "Paiement"
+          }
+        ],
+        "default": "cart"
+      },
+      {
+        "type": "text",
+        "id": "knr_cart_note",
+        "label": "Mention sous le bouton",
+        "default": "Les frais de livraison et codes promo s'appliquent lors du paiement"
+      },
+      {
+        "type": "text",
+        "id": "knr_cart_remove",
+        "label": "Lien supprimer",
+        "default": "Supprimer"
+      },
+      {
+        "type": "text",
+        "id": "knr_cart_reviews",
+        "label": "Mention avis",
+        "info": "[count] = nombre d'avis (métachamps custom.rating / custom.rating_count).",
+        "default": "[count] avis"
+      }
+    ]
   }
 ]

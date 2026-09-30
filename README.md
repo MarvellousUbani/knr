@@ -108,3 +108,32 @@ Upload the Files (step 2) before the first push so the image references resolve.
 - The desktop frame titles all three "How to use" cards "Découvrir". The template uses the mobile frame's descriptive titles instead; both are block settings.
 - The localization selectors reuse Dawn's snippets, so the country label reads "France | EUR €" rather than "France (€)". They only appear when more than one market or language is enabled.
 - The footer wordmark is an SVG `<text>` stretched to the column width (editable text, sharp at any size). An image can replace it.
+
+---
+
+# Test 2 — Gamified cart drawer (rewards, free samples, free product)
+
+The cart drawer shows a 3-step progress bar (free shipping → free samples → free product). Customers pick their free samples in a panel inside the drawer, and a free product is added or removed automatically. Everything is set up in **Theme settings → KNR · Récompenses panier**: thresholds, labels, messages (with `[amount]` / `[count]`), the sample collection, the maximum number of samples, the free product and all drawer text. Nothing is hardcoded.
+
+## Architecture
+- **`snippets/knr-cart-drawer.liquid`** replaces Dawn's drawer markup (when the rewards setting is on) but keeps Dawn's JS contract (`<cart-drawer>`, `.drawer__inner`, `<cart-drawer-items>`, `Drawer-quantity-N`, `<cart-remove-button>`, `.cart-item__name`, live regions, `.cart-drawer__footer`). Add to cart, quantity changes and removals still run through Dawn's `cart.js` / `cart-drawer.js` and the Section Rendering API.
+- **All reward state is computed in Liquid** (progress %, current step, message, sample slots, free product line), so every server render is correct on its own. Sub-snippets: `knr-cart-samples` (slots), `knr-cart-sample-picker` (the picker panel), `knr-cart-icon`.
+- **`assets/knr-cart-rewards.js`** (deferred) enforces the rules on the real cart after every `PUB_SUB_EVENTS.cartUpdate` and on page load:
+  - samples: none below the samples threshold, at most N above it, quantity 1 each;
+  - free product: added above its threshold, removed below it, quantity 1. If the customer removes it, a cart attribute (`_knr_gift_declined`) keeps it removed until the cart drops below the threshold again.
+
+  It then re-renders the drawer. All Cart API calls go through **one promise queue**, so rapid clicks can't interleave, and a render that's older than the latest Dawn update is dropped.
+- **Rules config:** `snippets/knr-cart-rewards-config.liquid` prints the rules as JSON from the settings, so the JS and the Liquid share one source of truth.
+- **Reward lines** are real €0 products tagged with a hidden `_knr_reward` line-item property. That keeps inventory, orders and checkout correct.
+- **Safety:** only **€0 variants** of the sample collection count as samples, so a paid product added to the collection by mistake is ignored.
+- **Dawn files touched:** `layout/theme.liquid` and `sections/cart-drawer.liquid` render the KNR drawer when the setting is on, and Dawn's otherwise. The settings group is added to `config/settings_schema.json`, and one translation key per locale.
+
+## Store setup
+- **Samples:** €0 products with option `Format` = `1 ml`, status Unlisted, in a manual collection selected in the settings.
+- **Free product:** a €0 product (Unlisted), selected in the settings.
+- **Shipping:** a €0 rate for orders of €50 or more, so "Livraison offerte" is also true at checkout.
+
+## Notes / limits
+- Thresholds apply to the cart total excluding reward lines, after line discounts, in the store currency (single EUR market).
+- A theme can't fully stop a determined user from adding a €0 product through a hand-crafted API call. The rules engine removes such lines on the next cart change or page load, and real server-side enforcement would need a Shopify Function (cart validation, via an app).
+- Design choices: the step labels follow the brief (€50 free shipping / €75 three samples / €100 free product) where the mockup was inconsistent, and the button total is the real cart total.

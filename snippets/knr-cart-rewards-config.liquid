@@ -1,0 +1,35 @@
+{% comment %}
+  Reward rules for assets/knr-cart-rewards.js, generated from the theme settings
+  (Theme settings → KNR · Récompenses panier). Amounts are in cents.
+{% endcomment %}
+{%- liquid
+  assign samples_collection = settings.knr_rewards_samples_collection
+  assign gift_product = settings.knr_rewards_gift_product
+  assign gift_variant = gift_product.selected_or_first_available_variant
+-%}
+<script type="application/json" id="KnrCartRewardsConfig">
+  {
+    "enabled": {{ settings.knr_rewards_enabled | json }},
+    "thresholds": {
+      "shipping": {{ settings.knr_rewards_threshold_shipping | times: 100 | json }},
+      "samples": {{ settings.knr_rewards_threshold_samples | times: 100 | json }},
+      "gift": {{ settings.knr_rewards_threshold_gift | times: 100 | json }}
+    },
+    "samplesMax": {{ settings.knr_rewards_samples_max | json }},
+    {%- comment -%} Only free (0 €) variants count as samples: a paid product added to the collection by mistake is ignored. {%- endcomment -%}
+    {%- liquid
+      assign free_ids = ''
+      for sample in samples_collection.products limit: 50
+        for variant in sample.variants
+          if variant.price == 0
+            assign free_ids = free_ids | append: variant.id | append: ','
+          endif
+        endfor
+      endfor
+      assign free_ids = free_ids | split: ','
+    -%}
+    "sampleVariantIds": [{{ free_ids | join: ',' }}],
+    "giftProductId": {{ gift_product.id | default: null | json }},
+    "giftVariantId": {% if gift_variant and gift_variant.available %}{{ gift_variant.id }}{% else %}null{% endif %}
+  }
+</script>

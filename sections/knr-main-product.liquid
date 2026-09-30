@@ -392,7 +392,23 @@
         </div>
       {%- endif -%}
 
-      {%- if complementary.size > 0 -%}
+      {%- comment -%}
+        Free (0 €) products are skipped: they are cart rewards (samples / gifts),
+        offered through the cart drawer, not sold here.
+      {%- endcomment -%}
+      {%- capture ritual_items -%}
+        {%- assign ritual_count = 0 -%}
+        {%- for item in complementary -%}
+          {%- if item.selected_or_first_available_variant.price > 0 and ritual_count < 8 -%}
+            {%- assign ritual_count = ritual_count | plus: 1 -%}
+            <li class="knr-ritual__item">
+              {%- render 'knr-product-card-mini', card_product: item -%}
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- if ritual_items != blank -%}
         <knr-scroller class="knr-ritual" aria-labelledby="KnrRitual-{{ section.id }}">
           <div class="knr-ritual__header">
             <h2 id="KnrRitual-{{ section.id }}" class="knr-ritual__title">{{ section.settings.complementary_heading | escape }}</h2>
@@ -406,11 +422,7 @@
             </button>
           </div>
           <ul class="knr-scroller knr-ritual__list" role="list" data-scroller-track>
-            {%- for item in complementary limit: 8 -%}
-              <li class="knr-ritual__item">
-                {%- render 'knr-product-card-mini', card_product: item -%}
-              </li>
-            {%- endfor -%}
+            {{- ritual_items -}}
           </ul>
         </knr-scroller>
       {%- endif -%}

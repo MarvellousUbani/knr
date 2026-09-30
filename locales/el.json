@@ -578,6 +578,9 @@
     },
     "news": {
       "placeholder_title": "Article title"
+    },
+    "cart": {
+      "rewards_label": "Your cart rewards"
     }
   }
 }

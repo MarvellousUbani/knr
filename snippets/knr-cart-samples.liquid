@@ -1,0 +1,64 @@
+{% comment %}
+  "Choisissez vos échantillons offerts" block (drawer footer).
+  Shows one slot per allowed sample: filled with the chosen sample or an empty "+" slot.
+  Every slot and the main button open the sample picker (knr-cart-sample-picker).
+
+  Accepts:
+  - samples_collection: {Collection}
+  - samples_max: {Number}
+  - sample_ids: {String} ",id,id," list of sample variant ids
+{% endcomment %}
+{%- liquid
+  assign chosen = 0
+  for item in cart.items
+    assign needle = ',' | append: item.variant_id | append: ','
+    if item.properties['_knr_reward'] == 'sample' or sample_ids contains needle
+      assign chosen = chosen | plus: item.quantity
+    endif
+  endfor
+-%}
+<div class="knr-samples" data-knr-samples>
+  <p class="knr-samples__heading">{{ settings.knr_rewards_samples_heading | escape }}</p>
+  <p class="knr-samples__sub">{{ settings.knr_rewards_samples_subheading | replace: '[count]', samples_max | escape }}</p>
+
+  <div class="knr-samples__row">
+    <ul class="knr-samples__slots" role="list">
+      {%- assign slot = 0 -%}
+      {%- for item in cart.items -%}
+        {%- assign needle = ',' | append: item.variant_id | append: ',' -%}
+        {%- if item.properties['_knr_reward'] == 'sample' or sample_ids contains needle -%}
+          {%- if slot < samples_max -%}
+            {%- assign slot = slot | plus: 1 -%}
+            <li class="knr-samples__slot is-filled">
+              <button type="button" class="knr-samples__slot-button" data-knr-picker-open>
+                {%- if item.image -%}
+                  {{ item.image | image_url: width: 96 | image_tag: loading: 'lazy', alt: '' }}
+                {%- endif -%}
+                <span class="knr-visually-hidden">{{ item.product.title | escape }} — {{ settings.knr_rewards_samples_edit | escape }}</span>
+              </button>
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- assign empty_slots = samples_max | minus: slot -%}
+      {%- if empty_slots > 0 -%}
+        {%- for i in (1..empty_slots) -%}
+          <li class="knr-samples__slot">
+            <button type="button" class="knr-samples__slot-button" data-knr-picker-open>
+              {%- render 'knr-cart-icon', icon: 'plus' -%}
+              <span class="knr-visually-hidden">{{ settings.knr_rewards_samples_choose | escape }}</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+
+    <button type="button" class="knr-samples__choose" data-knr-picker-open aria-haspopup="dialog">
+      {%- if chosen > 0 -%}
+        {{- settings.knr_rewards_samples_edit | escape -}}
+      {%- else -%}
+        {{- settings.knr_rewards_samples_choose | escape -}}
+      {%- endif -%}
+    </button>
+  </div>
+</div>

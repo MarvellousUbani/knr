@@ -590,6 +590,9 @@
     },
     "news": {
       "placeholder_title": "Titre de l'article"
+    },
+    "cart": {
+      "rewards_label": "Vos avantages panier"
     }
   }
 }

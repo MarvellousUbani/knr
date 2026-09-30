@@ -340,7 +340,16 @@
     </a>
 
     {%- if settings.cart_type == 'drawer' -%}
-      {%- render 'cart-drawer' -%}
+      {%- if settings.knr_rewards_enabled -%}
+        {%- render 'knr-cart-drawer' -%}
+      {%- else -%}
+        {%- render 'cart-drawer' -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if settings.knr_rewards_enabled -%}
+      {%- render 'knr-cart-rewards-config' -%}
+      <script src="{{ 'knr-cart-rewards.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
     {% sections 'header-group' %}

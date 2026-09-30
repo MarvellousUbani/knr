@@ -1,0 +1,362 @@
+{% comment %}
+  KNR gamified cart drawer (replaces Dawn's cart-drawer markup, keeps its JS contract).
+
+  Dawn's JS (cart-drawer.js / cart.js) relies on: <cart-drawer>, #CartDrawer,
+  #CartDrawer-Overlay, .drawer__inner, <cart-drawer-items>, #CartDrawer-CartItems,
+  #Drawer-quantity-N / data-index, <cart-remove-button>, the live regions and
+  .cart-drawer__footer. All of those are preserved, so quantity changes, removals and
+  add-to-cart keep using Dawn's Section Rendering flow.
+
+  Reward state (progress, samples, gift) is computed here in Liquid, so every
+  re-render of the drawer is automatically up to date. assets/knr-cart-rewards.js
+  only enforces the rules (adds/removes reward lines) and drives the sample picker.
+
+  Usage:
+  {% render 'knr-cart-drawer' %}
+{% endcomment %}
+
+{{ 'knr-cart-drawer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign t_shipping = settings.knr_rewards_threshold_shipping | times: 100
+  assign t_samples = settings.knr_rewards_threshold_samples | times: 100
+  assign t_gift = settings.knr_rewards_threshold_gift | times: 100
+  assign samples_max = settings.knr_rewards_samples_max
+  assign samples_collection = settings.knr_rewards_samples_collection
+  assign gift_product = settings.knr_rewards_gift_product
+
+  # Variant ids of every sample, as ",id,id," for cheap `contains` lookups
+  assign sample_ids = ','
+  # Only free (0 €) variants count as samples, so a paid product added to the collection by mistake is ignored.
+  assign free_sample_count = 0
+  for sample in samples_collection.products limit: 50
+    for variant in sample.variants
+      if variant.price == 0
+        assign sample_ids = sample_ids | append: variant.id | append: ','
+        assign free_sample_count = free_sample_count | plus: 1
+      endif
+    endfor
+  endfor
+
+  # Subtotal that counts toward the rewards: everything except reward lines
+  assign rewards_subtotal = 0
+  assign paid_count = 0
+  assign sample_count = 0
+  for item in cart.items
+    assign needle = ',' | append: item.variant_id | append: ','
+    if item.properties['_knr_reward'] == 'sample' or sample_ids contains needle
+      assign sample_count = sample_count | plus: item.quantity
+    elsif gift_product and item.product_id == gift_product.id
+      continue
+    else
+      assign rewards_subtotal = rewards_subtotal | plus: item.final_line_price
+      assign paid_count = paid_count | plus: item.quantity
+    endif
+  endfor
+
+  assign rewards_on = false
+  if settings.knr_rewards_enabled and t_shipping > 0 and t_samples > t_shipping and t_gift > t_samples
+    assign rewards_on = true
+  endif
+
+  # Progress: milestones sit at 1/6, 3/6 and 5/6 of the track (as in the design)
+  assign sub_f = rewards_subtotal | times: 1.0
+  if rewards_subtotal < t_shipping
+    assign tier = 0
+    assign fill = sub_f | divided_by: t_shipping | times: 16.667
+    assign remaining = t_shipping | minus: rewards_subtotal
+    assign message = settings.knr_rewards_msg_shipping
+  elsif rewards_subtotal < t_samples
+    assign tier = 1
+    assign span = t_samples | minus: t_shipping
+    assign fill = sub_f | minus: t_shipping | divided_by: span | times: 33.333 | plus: 16.667
+    assign remaining = t_samples | minus: rewards_subtotal
+    assign message = settings.knr_rewards_msg_samples
+  elsif rewards_subtotal < t_gift
+    assign tier = 2
+    assign span = t_gift | minus: t_samples
+    assign fill = sub_f | minus: t_samples | divided_by: span | times: 33.333 | plus: 50
+    assign remaining = t_gift | minus: rewards_subtotal
+    assign message = settings.knr_rewards_msg_gift
+  else
+    assign tier = 3
+    assign fill = 100
+    assign remaining = 0
+    assign message = settings.knr_rewards_msg_complete
+  endif
+
+  assign remaining_html = remaining | money | prepend: '<strong>' | append: '</strong>'
+  assign message = message | replace: '[amount]', remaining_html | replace: '[count]', samples_max
+  assign label_samples = settings.knr_rewards_label_samples | replace: '[count]', samples_max
+
+  assign samples_unlocked = false
+  if rewards_on and tier >= 2 and free_sample_count > 0
+    assign samples_unlocked = true
+  endif
+
+  if settings.knr_cart_cta_target == 'checkout'
+    assign cta_is_checkout = true
+  else
+    assign cta_is_checkout = false
+  endif
+-%}
+
+<cart-drawer class="drawer knr-cart{% if cart == empty %} is-empty{% endif %}">
+  <div id="CartDrawer" class="cart-drawer">
+    <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
+    <div
+      class="drawer__inner knr-cart__inner"
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ settings.knr_cart_title | escape }}"
+      tabindex="-1"
+    >
+      <div class="knr-cart__header">
+        <h2 class="knr-cart__title">
+          <span class="knr-cart__bag" aria-hidden="true">
+            {%- render 'knr-cart-icon', icon: 'bag' -%}
+            {%- if paid_count > 0 -%}<span class="knr-cart__bag-count">{{ paid_count }}</span>{%- endif -%}
+          </span>
+          {{ settings.knr_cart_title | escape }}
+        </h2>
+        <button
+          class="drawer__close knr-cart__close"
+          type="button"
+          onclick="this.closest('cart-drawer').close()"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {%- render 'knr-cart-icon', icon: 'close' -%}
+        </button>
+      </div>
+
+      {%- if cart == empty -%}
+        <div class="drawer__inner-empty knr-cart__empty">
+          <p class="knr-cart__empty-text">{{ 'sections.cart.empty' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="knr-cart__cta">
+            {{- 'general.continue_shopping' | t -}}
+          </a>
+        </div>
+      {%- endif -%}
+
+      <cart-drawer-items
+        class="knr-cart__body{% if cart == empty %} is-empty{% endif %}"
+        view-event-payload="{{ cart | standard_event_data: 'view', context: 'dialog' | escape }}"
+        view-event-trigger="manual"
+      >
+        {%- if rewards_on and cart != empty -%}
+          <div
+            class="knr-rewards"
+            data-tier="{{ tier }}"
+            role="group"
+            aria-label="{{ 'knr.cart.rewards_label' | t }}"
+          >
+            <p class="knr-rewards__message" aria-live="polite">{{ message }}</p>
+            <div class="knr-rewards__track" style="--knr-fill: {{ fill | at_most: 100 | at_least: 0 }}%;">
+              <div class="knr-rewards__bar" aria-hidden="true"><span class="knr-rewards__fill"></span></div>
+              <ol class="knr-rewards__steps" role="list">
+                {%- liquid
+                  assign step_labels = settings.knr_rewards_label_shipping | append: '||' | append: label_samples | append: '||' | append: settings.knr_rewards_label_gift | split: '||'
+                  assign step_icons = 'truck,sample,gift' | split: ','
+                -%}
+                {%- for label in step_labels -%}
+                  <li class="knr-rewards__step{% if tier >= forloop.index %} is-reached{% endif %}">
+                    <span class="knr-rewards__icon">{%- render 'knr-cart-icon', icon: step_icons[forloop.index0] -%}</span>
+                    <span class="knr-rewards__label">
+                      {{- label | escape -}}
+                      {%- if tier >= forloop.index -%}
+                        <span class="knr-visually-hidden"> ✓</span>
+                      {%- endif -%}
+                    </span>
+                  </li>
+                {%- endfor -%}
+              </ol>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <form action="{{ routes.cart_url }}" id="CartDrawer-Form" class="cart__contents knr-cart__form" method="post">
+          <div id="CartDrawer-CartItems" class="drawer__contents js-contents">
+            {%- if cart != empty -%}
+              <ul class="knr-cart__lines" role="list">
+                {%- comment -%} Two passes: paid lines first, the free product last (as in the design). {%- endcomment -%}
+                {%- for pass in (1..2) -%}
+                {%- for item in cart.items -%}
+                  {%- liquid
+                    assign needle = ',' | append: item.variant_id | append: ','
+                    assign is_sample = false
+                    if item.properties['_knr_reward'] == 'sample' or sample_ids contains needle
+                      assign is_sample = true
+                    endif
+                    assign is_gift = false
+                    if gift_product and item.product_id == gift_product.id
+                      assign is_gift = true
+                    endif
+                    assign line = item.index | plus: 1
+                    if pass == 1 and is_gift
+                      continue
+                    elsif pass == 2 and is_gift == false
+                      continue
+                    endif
+                  -%}
+                  {%- unless is_sample -%}
+                    <li
+                      id="CartDrawer-Item-{{ line }}"
+                      class="cart-item knr-line{% if is_gift %} knr-line--gift{% endif %}"
+                      {% if is_gift %}
+                        data-knr-reward="gift"
+                      {% endif %}
+                    >
+                      <a href="{{ item.url }}" class="knr-line__media" tabindex="-1" aria-hidden="true">
+                        {%- if item.image -%}
+                          {{ item.image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '', widths: '90, 180' }}
+                        {%- endif -%}
+                      </a>
+
+                      <div class="knr-line__info">
+                        {%- assign line_rating = item.product.metafields.custom.rating.value.rating | default: item.product.metafields.custom.rating.value -%}
+                        {%- assign line_rating_count = item.product.metafields.custom.rating_count.value -%}
+                        {%- if line_rating != blank -%}
+                          <p class="knr-line__rating">
+                            {%- render 'knr-stars', rating: line_rating, class: 'knr-line__stars' -%}
+                            {%- if line_rating_count != blank -%}
+                              <span>{{ settings.knr_cart_reviews | replace: '[count]', line_rating_count | escape }}</span>
+                            {%- endif -%}
+                            <span class="knr-visually-hidden">{{ 'knr.product.rating_label' | t: rating: line_rating, scale: 5 }}</span>
+                          </p>
+                        {%- endif -%}
+
+                        <a href="{{ item.url }}" class="cart-item__name knr-line__title">{{ item.product.title | escape }}</a>
+
+                        {%- unless item.product.has_only_default_variant -%}
+                          <p class="knr-line__variant">
+                            {%- for option in item.options_with_values -%}
+                              {{- option.value -}}
+                              {%- unless forloop.last %} · {% endunless -%}
+                            {%- endfor -%}
+                          </p>
+                        {%- endunless -%}
+
+                        {%- for property in item.properties -%}
+                          {%- assign first_char = property.first | slice: 0 -%}
+                          {%- if property.last != blank and first_char != '_' -%}
+                            <p class="knr-line__variant">{{ property.first }} : {{ property.last }}</p>
+                          {%- endif -%}
+                        {%- endfor -%}
+
+
+                      </div>
+
+                      <div class="knr-line__price">
+                        {%- render 'loading-spinner' -%}
+                        {%- if is_gift -%}
+                          <strong class="knr-line__free">{{ settings.knr_rewards_gift_badge | escape }}</strong>
+                        {%- elsif item.original_line_price != item.final_line_price -%}
+                          <s class="knr-line__old">{{ item.original_line_price | money }}</s>
+                          <span>{{ item.final_line_price | money }}</span>
+                        {%- else -%}
+                          <span>{{ item.final_line_price | money }}</span>
+                        {%- endif -%}
+                      </div>
+
+                      <div class="knr-line__actions">
+                        {%- if is_gift -%}
+                          <span></span>
+                          <button type="button" class="knr-line__remove" data-knr-gift-remove="{{ item.key }}">
+                            {{- settings.knr_cart_remove | escape -}}
+                            <span class="knr-visually-hidden">{{ item.product.title | escape }}</span>
+                          </button>
+                        {%- else -%}
+                          <quantity-input class="knr-qty">
+                            <button class="quantity__button knr-qty__button" name="minus" type="button">
+                              <span class="knr-visually-hidden">{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}</span>
+                              {%- render 'knr-cart-icon', icon: 'minus' -%}
+                            </button>
+                            <input
+                              class="knr-qty__input"
+                              type="number"
+                              data-quantity-variant-id="{{ item.variant.id }}"
+                              data-quantity-line-key="{{ item.key }}"
+                              name="updates[]"
+                              value="{{ item.quantity }}"
+                              min="{{ item.variant.quantity_rule.min | default: 1 }}"
+                              data-min="{{ item.variant.quantity_rule.min }}"
+                              {% if item.variant.quantity_rule.max != null %}
+                                max="{{ item.variant.quantity_rule.max }}"
+                              {% endif %}
+                              step="{{ item.variant.quantity_rule.increment }}"
+                              aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                              id="Drawer-quantity-{{ line }}"
+                              data-index="{{ line }}"
+                            >
+                            <button class="quantity__button knr-qty__button" name="plus" type="button">
+                              <span class="knr-visually-hidden">{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}</span>
+                              {%- render 'knr-cart-icon', icon: 'plus' -%}
+                            </button>
+                          </quantity-input>
+                          <cart-remove-button id="CartDrawer-Remove-{{ line }}" data-index="{{ line }}">
+                            <button type="button" class="knr-line__remove">
+                              {{- settings.knr_cart_remove | escape -}}
+                              <span class="knr-visually-hidden">{{ item.product.title | escape }}</span>
+                            </button>
+                          </cart-remove-button>
+                        {%- endif -%}
+                      </div>
+
+                      <div id="CartDrawer-LineItemError-{{ line }}" class="cart-item__error knr-line__error" role="alert">
+                        <small class="cart-item__error-text"></small>
+                      </div>
+                    </li>
+                  {%- endunless -%}
+                {%- endfor -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            <p id="CartDrawer-LiveRegionText" class="visually-hidden" role="status"></p>
+            <p id="CartDrawer-LineItemStatus" class="visually-hidden" aria-hidden="true" role="status">
+              {{ 'accessibility.loading' | t }}
+            </p>
+          </div>
+          <div id="CartDrawer-CartErrors" class="knr-cart__errors" role="alert"></div>
+        </form>
+      </cart-drawer-items>
+
+      <div class="drawer__footer knr-cart__footer">
+        <div class="cart-drawer__footer">
+          {%- if samples_unlocked and cart != empty -%}
+            {%- render 'knr-cart-samples',
+              samples_collection: samples_collection,
+              samples_max: samples_max,
+              sample_ids: sample_ids
+            -%}
+          {%- endif -%}
+
+          {%- if cart != empty -%}
+            {%- if cta_is_checkout -%}
+              <button type="submit" id="CartDrawer-Checkout" class="knr-cart__cta" name="checkout" form="CartDrawer-Form">
+                {{- settings.knr_cart_cta | escape }}
+                <span class="knr-cart__cta-sep" aria-hidden="true">|</span>
+                <span>{{ cart.total_price | money }}</span>
+              </button>
+            {%- else -%}
+              <a href="{{ routes.cart_url }}" id="CartDrawer-Checkout" class="knr-cart__cta">
+                {{- settings.knr_cart_cta | escape }}
+                <span class="knr-cart__cta-sep" aria-hidden="true">|</span>
+                <span>{{ cart.total_price | money }}</span>
+              </a>
+            {%- endif -%}
+            <p class="knr-cart__note">{{ settings.knr_cart_note | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if samples_unlocked and cart != empty -%}
+        {%- render 'knr-cart-sample-picker',
+          samples_collection: samples_collection,
+          samples_max: samples_max,
+          sample_ids: sample_ids
+        -%}
+      {%- endif -%}
+    </div>
+  </div>
+</cart-drawer>
