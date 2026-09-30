@@ -1,0 +1,252 @@
+{% comment %}
+  KNR footer: menu columns (Shopify navigation menus), brand/about column,
+  full-width wordmark, localization + copyright + social links.
+  Menu columns are <details> elements: accordions on mobile, forced open on
+  desktop by assets/knr.js (data-knr-open-desktop).
+{% endcomment %}
+
+{{ 'knr-footer.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign wordmark_text = section.settings.wordmark_text | default: shop.name | downcase
+  assign show_country = false
+  if section.settings.enable_country_selector and localization.available_countries.size > 1
+    assign show_country = true
+  endif
+  assign show_language = false
+  if section.settings.enable_language_selector and localization.available_languages.size > 1
+    assign show_language = true
+  endif
+-%}
+
+<footer class="knr-footer">
+  <div class="knr-footer__top knr-container">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'menu' -%}
+          <details class="knr-accordion knr-footer__menu" data-knr-open-desktop {{ block.shopify_attributes }}>
+            <summary>
+              <h2 class="knr-footer__heading">{{ block.settings.heading | default: block.settings.menu.title | escape }}</h2>
+              {%- render 'knr-icon', icon: 'chevron-down', class: 'knr-accordion__icon' -%}
+            </summary>
+            {%- if block.settings.menu.links.size > 0 -%}
+              <ul class="knr-footer__links" role="list">
+                {%- for link in block.settings.menu.links -%}
+                  <li>
+                    <a
+                      href="{{ link.url }}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{- link.title | escape -}}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </details>
+
+        {%- when 'about' -%}
+          <div class="knr-footer__about" {{ block.shopify_attributes }}>
+            <h2 class="knr-footer__heading">{{ block.settings.heading | escape }}</h2>
+            {%- if block.settings.text != blank -%}
+              <div class="knr-footer__about-text">{{ block.settings.text }}</div>
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 192
+                | image_tag:
+                  class: 'knr-footer__badge',
+                  widths: '48, 96, 144, 192',
+                  sizes: '48px',
+                  loading: 'lazy',
+                  alt: block.settings.image.alt
+              }}
+            {%- endif -%}
+            {%- if block.settings.caption != blank -%}
+              <p class="knr-footer__caption">{{ block.settings.caption | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+              <a class="knr-link knr-footer__certificate" href="{{ block.settings.link }}">
+                {{- block.settings.link_label | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+  <div class="knr-footer__wordmark">
+    {%- if section.settings.wordmark_image != blank -%}
+      {{
+        section.settings.wordmark_image
+        | image_url: width: 2720
+        | image_tag: widths: '390, 780, 1440, 2720', sizes: '100vw', loading: 'lazy', alt: shop.name
+      }}
+    {%- else -%}
+      <svg viewBox="0 0 1360 146" role="img" aria-label="{{ shop.name | escape }}" preserveAspectRatio="none">
+        <text x="0" y="143" textLength="1360" lengthAdjust="spacingAndGlyphs">{{ wordmark_text | escape }}</text>
+      </svg>
+    {%- endif -%}
+  </div>
+
+  <div class="knr-footer__bottom knr-container">
+    <div class="knr-footer__localization">
+      {%- if show_country -%}
+        <localization-form>
+          {%- form 'localization', id: 'KnrFooterCountryForm', class: 'localization-form' -%}
+            <h2 class="knr-visually-hidden" id="KnrFooterCountryLabel">{{ 'localization.country_label' | t }}</h2>
+            {%- render 'country-localization', localPosition: 'KnrFooterCountry', label_format: 'compact' -%}
+          {%- endform -%}
+        </localization-form>
+      {%- endif -%}
+      {%- if show_language -%}
+        <localization-form>
+          {%- form 'localization', id: 'KnrFooterLanguageForm', class: 'localization-form' -%}
+            <h2 class="knr-visually-hidden" id="KnrFooterLanguageLabel">{{ 'localization.language_label' | t }}</h2>
+            {%- render 'language-localization', localPosition: 'KnrFooterLanguage' -%}
+          {%- endform -%}
+        </localization-form>
+      {%- endif -%}
+    </div>
+
+    <p class="knr-footer__copyright">
+      {%- assign current_year = 'now' | date: '%Y' -%}
+      {{- section.settings.copyright | replace: '[year]', current_year | escape -}}
+    </p>
+
+    {%- capture social_links -%}
+      {%- if settings.social_facebook_link != blank -%}
+        <li><a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener">{%- render 'knr-icon', icon: 'facebook' -%}<span class="knr-visually-hidden">Facebook</span></a></li>
+      {%- endif -%}
+      {%- if settings.social_instagram_link != blank -%}
+        <li><a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">{%- render 'knr-icon', icon: 'instagram' -%}<span class="knr-visually-hidden">Instagram</span></a></li>
+      {%- endif -%}
+      {%- if settings.social_tiktok_link != blank -%}
+        <li><a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener">{%- render 'knr-icon', icon: 'tiktok' -%}<span class="knr-visually-hidden">TikTok</span></a></li>
+      {%- endif -%}
+      {%- if section.settings.linkedin_link != blank -%}
+        <li><a href="{{ section.settings.linkedin_link }}" target="_blank" rel="noopener">{%- render 'knr-icon', icon: 'linkedin' -%}<span class="knr-visually-hidden">LinkedIn</span></a></li>
+      {%- endif -%}
+    {%- endcapture -%}
+    {%- if social_links != blank -%}
+      <ul class="knr-footer__social" role="list">{{ social_links }}</ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "KNR · Footer",
+  "tag": "div",
+  "class": "section knr-footer-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "wordmark_text",
+      "label": "Wordmark text",
+      "info": "Defaults to the store name. Rendered in the theme font, stretched to the full width."
+    },
+    {
+      "type": "image_picker",
+      "id": "wordmark_image",
+      "label": "Wordmark image",
+      "info": "Optional. Replaces the text wordmark (use a wide SVG/PNG logo)."
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Copyright",
+      "info": "[year] is replaced by the current year.",
+      "default": "© [year] Maison Célestine. Tous droits réservés."
+    },
+    {
+      "type": "url",
+      "id": "linkedin_link",
+      "label": "LinkedIn link",
+      "info": "Facebook, Instagram and TikTok use the theme social media settings."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "label": "Show country/region selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "label": "Show language selector",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "info": "Defaults to the menu title."
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "type": "about",
+      "name": "About",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "À propos de Maison Célestine"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d’actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Certification logo"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Certification text",
+          "default": "Certifié COSMOS ORGANIC par ECOCERT Greenlife"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "default": "Voir le certificat"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Footer"
+    }
+  ]
+}
+{% endschema %}

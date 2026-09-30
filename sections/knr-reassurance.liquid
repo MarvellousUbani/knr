@@ -1,0 +1,86 @@
+{{ 'knr-reassurance.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+<section class="knr-section knr-reassurance" aria-label="{{ section.settings.label | escape }}">
+  <knr-scroller class="knr-reassurance__inner">
+    <ul class="knr-scroller knr-reassurance__list" role="list" data-scroller-track>
+      {%- for block in section.blocks -%}
+        <li
+          class="knr-reassurance__item{{ reveal }}"
+          data-cascade
+          style="--animation-order: {{ forloop.index }};"
+          {{ block.shopify_attributes }}
+        >
+          <h2 class="knr-reassurance__title">{{ block.settings.title | escape }}</h2>
+          {%- if block.settings.text != blank -%}
+            <p class="knr-reassurance__text">{{ block.settings.text | escape | newline_to_br }}</p>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if section.blocks.size > 1 -%}
+      <div class="knr-dashes knr-reassurance__dots">
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            aria-label="{{ block.settings.title | escape }}"
+            {% if forloop.first %}
+              aria-current="true"
+            {% endif %}
+            data-scroller-dot
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </knr-scroller>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Reassurance",
+  "tag": "div",
+  "class": "section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Accessible label",
+      "default": "Nos engagements"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Livraison offerte"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "info": "Line breaks are kept on desktop.",
+          "default": "Livraison offerte\ndès 60 € d'achat\nen France métropolitaine."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Reassurance",
+      "blocks": [{ "type": "item" }, { "type": "item" }, { "type": "item" }, { "type": "item" }]
+    }
+  ]
+}
+{% endschema %}

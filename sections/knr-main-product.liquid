@@ -1,0 +1,683 @@
+{% comment %}
+  KNR main product section.
+
+  Built around Dawn's native product components so variant switching, cart
+  submission, sold-out states and URL updates are handled by the theme itself:
+  - <product-info>  (assets/product-info.js) re-renders price / inventory / picker
+  - <variant-selects> via snippets/product-variant-picker
+  - <product-form> via snippets/buy-buttons (+ quick-add forms for the ritual cards)
+  - <product-modal> via snippets/product-media-modal for the "+" zoom buttons
+{% endcomment %}
+
+{{ 'knr-main-product.css' | asset_url | stylesheet_tag }}
+{{ 'knr-header.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+  assign desktop_media_count = section.settings.desktop_media_count
+
+  # Rating: custom.rating / custom.rating_count, falling back to the standard reviews.* fields.
+  # custom.rating may be a Rating or a plain number metafield.
+  assign rating_source = product.metafields.custom.rating | default: product.metafields.reviews.rating
+  if rating_source.type == 'rating'
+    assign rating_value = rating_source.value.rating
+    assign rating_scale = rating_source.value.scale_max | default: 5 | round
+  else
+    assign rating_value = rating_source.value
+    assign rating_scale = 5
+  endif
+  assign rating_count = product.metafields.custom.rating_count.value | default: product.metafields.reviews.rating_count.value
+
+  assign badges = product.metafields.custom.badges.value
+  if badges == blank
+    assign badges = ''
+    for tag in product.tags
+      if tag contains 'badge:'
+        assign badge_label = tag | remove_first: 'badge:' | strip
+        assign badges = badges | append: badge_label | append: '||'
+      endif
+    endfor
+    assign badges = badges | split: '||'
+  endif
+
+  assign short_description = product.metafields.custom.short_description | metafield_tag
+  if product.metafields.custom.short_description == blank
+    assign short_description = product.description | strip_html | truncatewords: 30
+  endif
+
+  assign complementary = product.metafields['shopify--discovery--product_recommendation'].complementary_products.value
+  if complementary == blank
+    assign complementary = product.metafields.custom.complementary_products.value
+  endif
+  if complementary == blank
+    assign complementary = section.settings.complementary_products
+  endif
+-%}
+
+{%- capture badges_markup -%}
+  {%- if badges.size > 0 -%}
+    <ul class="knr-badges" role="list">
+      {%- for badge in badges -%}
+        <li class="knr-badges__item">{{ badge | escape }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+{%- endcapture -%}
+
+<section
+  id="KnrProduct-{{ section.id }}"
+  class="knr-section knr-product"
+  aria-label="{{ product.title | escape }}"
+>
+  <product-info
+    id="MainProduct-{{ section.id }}"
+    class="knr-product__layout"
+    data-section="{{ section.id }}"
+    data-product-id="{{ product.id }}"
+    data-update-url="true"
+    data-url="{{ product.url }}"
+  >
+    {%- comment -%} Media: full-bleed hero + grid on desktop, swipe slider on mobile {%- endcomment -%}
+    <knr-product-gallery class="knr-gallery" data-section="{{ section.id }}">
+      <div class="knr-gallery__badges">{{ badges_markup }}</div>
+
+      <ul
+        class="knr-gallery__list"
+        role="list"
+        aria-label="{{ 'knr.product.gallery_label' | t: title: product.title | escape }}"
+        data-scroller-track
+      >
+        {%- for media in product.media -%}
+          {%- liquid
+            assign is_hero = false
+            if forloop.first
+              assign is_hero = true
+            endif
+
+            if is_hero
+              assign sizes = '100vw'
+              assign loading = 'eager'
+              assign fetchpriority = 'high'
+            else
+              assign sizes = '(min-width: 990px) calc((100vw - 504px) / 2), 100vw'
+              assign loading = 'lazy'
+              assign fetchpriority = 'auto'
+            endif
+
+            assign focal_point = media.preview_image.presentation.focal_point | default: 'center'
+            assign media_style = 'object-position: ' | append: focal_point | append: ';'
+          -%}
+          <li
+            class="knr-gallery__item{% if is_hero %} knr-gallery__item--hero{% endif %}{% if forloop.index > desktop_media_count %} knr-gallery__item--mobile-only{% endif %}"
+            data-media-id="{{ section.id }}-{{ media.id }}"
+          >
+            <div class="knr-media knr-gallery__media">
+              {%- if is_hero and section.settings.hero_image_mobile != blank -%}
+                {%- assign hero_mobile = section.settings.hero_image_mobile -%}
+                <picture>
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {{ hero_mobile | image_url: width: 390 }} 390w,
+                      {{ hero_mobile | image_url: width: 780 }} 780w,
+                      {{ hero_mobile | image_url: width: 1170 }} 1170w
+                    "
+                    sizes="100vw"
+                  >
+              {%- endif -%}
+              {{
+                media.preview_image
+                | image_url: width: 2880
+                | image_tag:
+                  widths: '390, 550, 750, 1100, 1440, 1880, 2200, 2880',
+                  sizes: sizes,
+                  loading: loading,
+                  fetchpriority: fetchpriority,
+                  alt: media.alt,
+                  style: media_style
+              }}
+              {%- if is_hero and section.settings.hero_image_mobile != blank -%}
+                </picture>
+              {%- endif -%}
+            </div>
+
+            {%- unless is_hero -%}
+              <modal-opener class="knr-gallery__zoom" data-modal="#ProductModal-{{ section.id }}">
+                <button
+                  type="button"
+                  class="knr-icon-button"
+                  data-media-id="{{ media.id }}"
+                  aria-label="{{ 'knr.product.zoom' | t }}"
+                  aria-haspopup="dialog"
+                >
+                  {%- render 'knr-icon', icon: 'plus' -%}
+                </button>
+              </modal-opener>
+            {%- endunless -%}
+          </li>
+        {%- else -%}
+          <li class="knr-gallery__item knr-gallery__item--hero">
+            <div class="knr-media knr-gallery__media">
+              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- if product.media.size > 1 -%}
+        <button
+          type="button"
+          class="knr-icon-button knr-gallery__next"
+          aria-label="{{ 'knr.general.next' | t }}"
+          data-gallery-next
+        >
+          {%- render 'knr-icon', icon: 'chevron-right' -%}
+        </button>
+        <div class="knr-progress knr-gallery__progress" aria-hidden="true">
+          <span class="knr-progress__bar" data-progress-bar></span>
+        </div>
+      {%- endif -%}
+    </knr-product-gallery>
+
+    {%- comment -%} Buy box {%- endcomment -%}
+    <div class="knr-panel">
+      {%- if section.settings.show_breadcrumb -%}
+        {%- comment -%}
+          Uses the collection the product was reached from when available,
+          otherwise the product's own collections (max 2). Nothing is rendered
+          when there is no collection, so no dead links are produced.
+        {%- endcomment -%}
+        {%- capture breadcrumb_items -%}
+          {%- if collection -%}
+            <li><a href="{{ collection.url }}">{{ collection.title | escape }}</a></li>
+          {%- else -%}
+            {%- assign crumb_count = 0 -%}
+            {%- for crumb in product.collections -%}
+              {%- if crumb.handle != 'all' and crumb.handle != 'frontpage' and crumb_count < 2 -%}
+                <li><a href="{{ crumb.url }}">{{ crumb.title | escape }}</a></li>
+                {%- assign crumb_count = crumb_count | plus: 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endcapture -%}
+        {%- if breadcrumb_items != blank -%}
+          <nav class="knr-panel__breadcrumb knr-caption" aria-label="{{ 'knr.product.breadcrumb' | t }}">
+            <ol role="list">{{ breadcrumb_items }}</ol>
+          </nav>
+        {%- endif -%}
+      {%- endif -%}
+
+      <div class="knr-panel__badges">{{ badges_markup }}</div>
+
+      <h1 class="knr-panel__title">{{ product.title | escape }}</h1>
+
+      {%- if rating_value != blank -%}
+        <a class="knr-panel__rating" href="#{{ section.settings.reviews_anchor | default: 'avis' }}">
+          {%- render 'knr-stars', rating: rating_value, scale: rating_scale -%}
+          <span class="knr-panel__rating-value">{{ rating_value | round: 1 }}</span>
+          {%- if rating_count != blank -%}
+            <span class="knr-panel__rating-sep" aria-hidden="true">·</span>
+            <span class="knr-panel__rating-count">
+              {{- 'knr.product.review_count' | t: count: rating_count -}}
+            </span>
+          {%- endif -%}
+          <span class="knr-visually-hidden">
+            {{- 'knr.product.rating_label' | t: rating: rating_value, scale: rating_scale -}}
+          </span>
+        </a>
+      {%- endif -%}
+
+      <div id="price-{{ section.id }}" class="knr-panel__price knr-price" role="status">
+        <div class="knr-price__row">
+          {%- liquid
+            assign on_sale = false
+            if current_variant.compare_at_price > current_variant.price
+              assign on_sale = true
+            endif
+          -%}
+          <span class="knr-price__current">
+            <span class="knr-visually-hidden">
+              {%- if on_sale -%}
+                {{ 'products.product.price.sale_price' | t }}
+              {%- else -%}
+                {{ 'products.product.price.regular_price' | t }}
+              {%- endif -%}
+            </span>
+            {{- current_variant.price | money -}}
+          </span>
+          {%- if on_sale -%}
+            <s class="knr-price__compare">
+              <span class="knr-visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+              {{- current_variant.compare_at_price | money -}}
+            </s>
+          {%- endif -%}
+        </div>
+        {%- if current_variant.unit_price_measurement -%}
+          <p class="knr-price__unit">
+            {{- current_variant.unit_price | money }}
+            {{ 'knr.product.unit_price_per' | t }}
+            {% if current_variant.unit_price_measurement.reference_value != 1 -%}
+              {{- current_variant.unit_price_measurement.reference_value -}}
+              &nbsp;
+            {%- endif -%}
+            {{ current_variant.unit_price_measurement.reference_unit }}
+          </p>
+        {%- endif -%}
+      </div>
+
+      {%- if product.metafields.custom.scores != blank -%}
+        <div class="knr-panel__scores">{{ product.metafields.custom.scores | metafield_tag }}</div>
+      {%- endif -%}
+
+      {%- if short_description != blank -%}
+        <div class="knr-panel__summary">{{ short_description }}</div>
+      {%- endif -%}
+
+      <div class="knr-panel__picker">
+        {%- render 'product-variant-picker', product: product, block: section, product_form_id: product_form_id -%}
+      </div>
+
+      <div class="knr-panel__form">
+        {%- render 'buy-buttons',
+          block: section,
+          product: product,
+          product_form_id: product_form_id,
+          section_id: section.id,
+          show_pickup_availability: false
+        -%}
+      </div>
+
+      {%- liquid
+        assign message_blocks = section.blocks | where: 'type', 'message'
+        assign slide_count = message_blocks.size | plus: 1
+      -%}
+      <knr-rotator class="knr-panel__messages" data-interval="{{ section.settings.messages_interval }}">
+        <div class="knr-rotator__viewport" aria-live="polite">
+          <p
+            id="Inventory-{{ section.id }}"
+            class="knr-rotator__slide knr-panel__stock"
+            data-rotator-slide
+          >
+            {%- liquid
+              if current_variant.available
+                assign delivery_ts = 'now' | date: '%s' | plus: 0
+                assign delivery_seconds = section.settings.delivery_days | times: 86400
+                assign delivery_ts = delivery_ts | plus: delivery_seconds
+                assign weekday = delivery_ts | date: '%w' | plus: 0
+                if weekday == 6
+                  assign delivery_ts = delivery_ts | plus: 172800
+                elsif weekday == 0
+                  assign delivery_ts = delivery_ts | plus: 86400
+                endif
+
+                assign weekday_names = 'knr.date.weekdays' | t | split: ','
+                assign month_names = 'knr.date.months' | t | split: ','
+                assign weekday_index = delivery_ts | date: '%w' | plus: 0
+                assign month_index = delivery_ts | date: '%-m' | minus: 1
+                capture delivery_date
+                  echo weekday_names[weekday_index] | strip | append: ' '
+                  echo delivery_ts | date: '%-d' | append: ' '
+                  echo month_names[month_index] | strip
+                endcapture
+
+                echo section.settings.stock_message | replace: '[date]', delivery_date
+              else
+                echo section.settings.sold_out_message
+              endif
+            -%}
+          </p>
+          {%- for block in message_blocks -%}
+            <p class="knr-rotator__slide" data-rotator-slide hidden {{ block.shopify_attributes }}>
+              {{- block.settings.text -}}
+            </p>
+          {%- endfor -%}
+        </div>
+        {%- if slide_count > 1 -%}
+          <div class="knr-dashes" data-rotator-dots>
+            {%- for i in (1..slide_count) -%}
+              <button
+                type="button"
+                aria-label="{{ 'knr.general.slide' | t: index: i, count: slide_count }}"
+                {% if forloop.first %}
+                  aria-current="true"
+                {% endif %}
+                data-rotator-dot="{{ forloop.index0 }}"
+              ></button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </knr-rotator>
+
+      {%- assign accordion_blocks = section.blocks | where: 'type', 'collapsible' -%}
+      {%- if accordion_blocks.size > 0 -%}
+        <div class="knr-panel__accordions">
+          {%- for block in accordion_blocks -%}
+            {%- liquid
+              assign row_content = blank
+              case block.settings.source
+                when 'description'
+                  assign row_content = product.description
+                when 'metafield'
+                  assign metafield_parts = block.settings.metafield | split: '.'
+                  assign row_metafield = product.metafields[metafield_parts[0]][metafield_parts[1]]
+                  if row_metafield != blank
+                    assign row_content = row_metafield | metafield_tag
+                  endif
+              endcase
+              if row_content == blank
+                assign row_content = block.settings.content
+              endif
+            -%}
+            {%- if row_content != blank -%}
+              <details
+                class="knr-accordion knr-panel__accordion"
+                {% if block.settings.open %}
+                  open
+                {% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <summary>
+                  <h2 class="knr-panel__accordion-title">{{ block.settings.heading | escape }}</h2>
+                  {%- render 'knr-icon', icon: 'chevron-down', class: 'knr-accordion__icon' -%}
+                </summary>
+                <div class="knr-panel__accordion-content knr-rte">{{ row_content }}</div>
+              </details>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if complementary.size > 0 -%}
+        <knr-scroller class="knr-ritual" aria-labelledby="KnrRitual-{{ section.id }}">
+          <div class="knr-ritual__header">
+            <h2 id="KnrRitual-{{ section.id }}" class="knr-ritual__title">{{ section.settings.complementary_heading | escape }}</h2>
+            <button
+              type="button"
+              class="knr-icon-button knr-ritual__next"
+              aria-label="{{ 'knr.general.next' | t }}"
+              data-scroller-next
+            >
+              {%- render 'knr-icon', icon: 'chevron-right' -%}
+            </button>
+          </div>
+          <ul class="knr-scroller knr-ritual__list" role="list" data-scroller-track>
+            {%- for item in complementary limit: 8 -%}
+              <li class="knr-ritual__item">
+                {%- render 'knr-product-card-mini', card_product: item -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </knr-scroller>
+      {%- endif -%}
+    </div>
+  </product-info>
+
+  {%- if section.settings.enable_sticky_bar -%}
+    <knr-sticky-atc
+      class="knr-sticky"
+      data-section="{{ section.id }}"
+      data-form="{{ product_form_id }}"
+      hidden
+    >
+      <div class="knr-sticky__inner" id="KnrSticky-{{ section.id }}">
+        {%- assign sticky_image = current_variant.featured_image | default: product.featured_image -%}
+        {%- if sticky_image -%}
+          <div class="knr-media knr-sticky__media">
+            {{ sticky_image | image_url: width: 208 | image_tag: loading: 'lazy', alt: '' }}
+          </div>
+        {%- endif -%}
+        <div class="knr-sticky__info">
+          <p class="knr-sticky__title">{{ product.title | escape }}</p>
+          {%- unless product.has_only_default_variant -%}
+            {%- for option in product.options_with_values -%}
+              <div class="knr-sticky__options" role="group" aria-label="{{ option.name | escape }}">
+                {%- for value in option.values -%}
+                  <button
+                    type="button"
+                    class="knr-sticky__option"
+                    data-option-position="{{ option.position }}"
+                    data-option-value="{{ value | escape }}"
+                    aria-pressed="{{ value.selected }}"
+                    {% unless value.available %}
+                      data-unavailable
+                    {% endunless %}
+                  >
+                    {{- value -}}
+                  </button>
+                {%- endfor -%}
+              </div>
+            {%- endfor -%}
+          {%- endunless -%}
+          <p class="knr-sticky__price">{{ current_variant.price | money }}</p>
+        </div>
+        <button
+          type="submit"
+          form="{{ product_form_id }}"
+          class="knr-button knr-sticky__submit"
+          {% unless current_variant.available %}
+            disabled
+          {% endunless %}
+        >
+          {%- if current_variant.available -%}
+            {{ 'products.product.add_to_cart' | t }}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- endif -%}
+        </button>
+      </div>
+    </knr-sticky-atc>
+  {%- endif -%}
+
+  {%- render 'product-media-modal', product: product, variant_images: blank -%}
+
+  <script type="application/ld+json">
+    {{ product | structured_data }}
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Main product",
+  "tag": "div",
+  "class": "section knr-product-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "range",
+      "id": "desktop_media_count",
+      "label": "Images shown on desktop",
+      "info": "The first image is the full-width hero. Remaining images are shown in the mobile slider.",
+      "min": 1,
+      "max": 7,
+      "step": 2,
+      "default": 3
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Mobile hero image",
+      "info": "Optional art-directed crop of the first product image for phones (portrait, ~390:435)."
+    },
+    {
+      "type": "header",
+      "content": "Buy box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show breadcrumb",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "picker_type",
+      "label": "Variant picker",
+      "options": [
+        { "value": "button", "label": "Text buttons" },
+        { "value": "dropdown", "label": "Dropdown" }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "select",
+      "id": "swatch_shape",
+      "label": "Swatches",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "circle", "label": "Circle" },
+        { "value": "square", "label": "Square" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout buttons",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_card_recipient",
+      "label": "Show gift card recipient form",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "reviews_anchor",
+      "label": "Reviews section anchor",
+      "info": "Must match the anchor set on the KNR · Reviews section.",
+      "default": "avis"
+    },
+    {
+      "type": "header",
+      "content": "Stock & delivery message"
+    },
+    {
+      "type": "text",
+      "id": "stock_message",
+      "label": "In stock message",
+      "info": "[date] is replaced by the estimated delivery date.",
+      "default": "En stock, livraison estimée [date]."
+    },
+    {
+      "type": "range",
+      "id": "delivery_days",
+      "label": "Delivery estimate",
+      "min": 1,
+      "max": 14,
+      "step": 1,
+      "unit": "d",
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "sold_out_message",
+      "label": "Sold out message",
+      "default": "Actuellement épuisé."
+    },
+    {
+      "type": "range",
+      "id": "messages_interval",
+      "label": "Message rotation",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Complementary products"
+    },
+    {
+      "type": "paragraph",
+      "content": "Uses the Search & Discovery complementary products first, then the custom.complementary_products metafield, then the list below."
+    },
+    {
+      "type": "text",
+      "id": "complementary_heading",
+      "label": "Heading",
+      "default": "Complétez votre rituel"
+    },
+    {
+      "type": "product_list",
+      "id": "complementary_products",
+      "label": "Fallback products",
+      "limit": 8
+    },
+    {
+      "type": "header",
+      "content": "Sticky add to cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_bar",
+      "label": "Show sticky bar when the main button is out of view",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collapsible",
+      "name": "Collapsible row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Description"
+        },
+        {
+          "type": "select",
+          "id": "source",
+          "label": "Content source",
+          "options": [
+            { "value": "description", "label": "Product description" },
+            { "value": "metafield", "label": "Product metafield" },
+            { "value": "content", "label": "Rich text below" }
+          ],
+          "default": "description"
+        },
+        {
+          "type": "text",
+          "id": "metafield",
+          "label": "Metafield (namespace.key)",
+          "info": "Used when the source is a product metafield, e.g. custom.benefits"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Rich text",
+          "info": "Also used as a fallback when the metafield is empty."
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Open by default",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "name": "Reassurance message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Livraison offerte dès 60 € d'achat."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

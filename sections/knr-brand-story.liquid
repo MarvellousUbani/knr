@@ -1,0 +1,139 @@
+{{ 'knr-brand-story.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign heading_mobile = section.settings.heading_mobile | default: section.settings.heading
+  assign newsletter_form_id = 'KnrNewsletter-' | append: section.id
+-%}
+
+<section class="knr-section knr-brand" aria-labelledby="KnrBrand-{{ section.id }}">
+  <div class="knr-brand__inner knr-container">
+    <div class="knr-media knr-brand__media{{ reveal }}">
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 1360
+          | image_tag:
+            widths: '390, 684, 1020, 1360',
+            sizes: '(min-width: 750px) 47vw, calc(100vw - 48px)',
+            loading: 'lazy',
+            alt: image.alt
+        }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    <div class="knr-brand__content{{ reveal }}">
+      <h2 id="KnrBrand-{{ section.id }}" class="knr-brand__heading">
+        <span class="knr-brand__heading--desktop">{{ section.settings.heading | escape }}</span>
+        <span class="knr-brand__heading--mobile">{{ heading_mobile | escape }}</span>
+      </h2>
+
+      {%- form 'customer', id: newsletter_form_id, class: 'knr-brand__form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="knr-brand__field">
+          <label class="knr-visually-hidden" for="KnrNewsletterEmail-{{ section.id }}">
+            {{- section.settings.email_label | escape -}}
+          </label>
+          <input
+            id="KnrNewsletterEmail-{{ section.id }}"
+            class="knr-brand__input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="{{ section.settings.email_label | escape }}"
+            required
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="KnrNewsletterError-{{ section.id }}"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="KnrNewsletterSuccess-{{ section.id }}"
+            {% endif %}
+          >
+          <button type="submit" class="knr-button knr-brand__submit" name="commit">
+            {{- section.settings.button_label | escape -}}
+          </button>
+        </div>
+
+        {%- if form.errors -%}
+          <p id="KnrNewsletterError-{{ section.id }}" class="knr-brand__message" role="alert">
+            {{- form.errors.translated_fields.email | capitalize }}
+            {{ form.errors.messages.email -}}
+          </p>
+        {%- elsif form.posted_successfully? -%}
+          <p id="KnrNewsletterSuccess-{{ section.id }}" class="knr-brand__message" role="status">
+            {{- 'newsletter.success' | t -}}
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+
+      {%- if section.settings.disclaimer != blank -%}
+        <div class="knr-brand__disclaimer">{{ section.settings.disclaimer }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Brand story",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "L'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines."
+    },
+    {
+      "type": "textarea",
+      "id": "heading_mobile",
+      "label": "Mobile heading",
+      "info": "Optional shorter/longer variant for small screens."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email placeholder",
+      "default": "E-mail"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "S’inscrire"
+    },
+    {
+      "type": "richtext",
+      "id": "disclaimer",
+      "label": "Text below the form",
+      "default": "<p>Formule brevetée, testée dermatologiquement, 97 % d'ingrédients d'origine naturelle.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Brand story"
+    }
+  ]
+}
+{% endschema %}

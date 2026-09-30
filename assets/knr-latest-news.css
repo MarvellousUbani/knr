@@ -1,0 +1,125 @@
+/* KNR · Latest news — blog articles, 4-up on desktop, swipe cards on mobile. */
+
+.knr-news {
+  padding: 0 0 64px;
+  background: var(--knr-white);
+}
+
+.knr-news__inner {
+  display: grid;
+  grid-template-areas:
+    'heading'
+    'list'
+    'progress'
+    'all';
+}
+
+.knr-news__heading {
+  grid-area: heading;
+  padding-inline: var(--knr-gutter);
+}
+
+.knr-news__list {
+  grid-area: list;
+  grid-auto-columns: 255px;
+  margin: 40px 0 0;
+  padding: 0 var(--knr-gutter);
+  scroll-padding-inline: var(--knr-gutter);
+  list-style: none;
+}
+
+.knr-news__media {
+  display: block;
+  aspect-ratio: 1;
+}
+
+.knr-news__media img,
+.knr-news__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.knr-news__tag {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.knr-news__tag::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 1px;
+  margin-top: 10px;
+  background: var(--knr-gold);
+}
+
+.knr-news__title {
+  /* ~8.9em keeps the design's balanced two-line titles at 24px. */
+  max-width: 8.9em;
+  margin-top: 18px;
+  font-size: var(--knr-fs-lead);
+  line-height: 32px;
+}
+
+.knr-news__title a {
+  text-decoration: none;
+}
+
+.knr-news__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+.knr-news__excerpt {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.knr-news__progress {
+  grid-area: progress;
+  margin-top: 64px;
+}
+
+.knr-news__inner:not([data-overflowing]) .knr-news__progress {
+  visibility: hidden;
+}
+
+.knr-news__all {
+  grid-area: all;
+  justify-self: center;
+  margin-top: 48px;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-news {
+    padding-bottom: 120px;
+  }
+
+  .knr-news__inner {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'heading all'
+      'list list';
+    align-items: end;
+  }
+
+  /* Fixed 4-up grid: cards keep the design size whatever the article count. */
+  .knr-news__list {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .knr-news__progress {
+    display: none;
+  }
+
+  .knr-news__all {
+    justify-self: end;
+    margin: 0 var(--knr-gutter) 6px 0;
+  }
+}

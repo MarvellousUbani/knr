@@ -1,0 +1,363 @@
+{% comment %}
+  Reviews source priority:
+  1. Product metafield (list of `product_review` metaobjects), key set in settings
+     (default custom.reviews). Fields: author, verified, title, body, rating, date
+  2. Section blocks (manual reviews)
+  Summary uses custom.rating / custom.rating_count (falling back to reviews.rating / reviews.rating_count)
+  when present, otherwise it is computed from the listed reviews.
+{% endcomment %}
+
+{{ 'knr-reviews.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
+  assign review_items = blank
+  if product and section.settings.metafield != blank
+    assign metafield_parts = section.settings.metafield | split: '.'
+    assign review_items = product.metafields[metafield_parts[0]][metafield_parts[1]].value
+  endif
+
+  assign use_metaobjects = false
+  if review_items.size > 0
+    assign use_metaobjects = true
+  endif
+
+  assign star_5 = 0
+  assign star_4 = 0
+  assign star_3 = 0
+  assign star_2 = 0
+  assign star_1 = 0
+  assign rating_sum = 0
+  assign total = 0
+  assign ratings_csv = ''
+
+  if use_metaobjects
+    for item in review_items
+      assign r = item.rating.value.rating | default: item.rating.value | default: 5 | round
+      capture ratings_csv
+        echo ratings_csv
+        echo r
+        echo ','
+      endcapture
+    endfor
+  else
+    for block in section.blocks
+      assign r = block.settings.rating
+      capture ratings_csv
+        echo ratings_csv
+        echo r
+        echo ','
+      endcapture
+    endfor
+  endif
+
+  assign ratings = ratings_csv | split: ','
+  for r in ratings
+    assign r_num = r | plus: 0
+    case r_num
+      when 5
+        assign star_5 = star_5 | plus: 1
+      when 4
+        assign star_4 = star_4 | plus: 1
+      when 3
+        assign star_3 = star_3 | plus: 1
+      when 2
+        assign star_2 = star_2 | plus: 1
+      when 1
+        assign star_1 = star_1 | plus: 1
+    endcase
+    assign rating_sum = rating_sum | plus: r_num
+    assign total = total | plus: 1
+  endfor
+
+  assign rating_source = product.metafields.custom.rating | default: product.metafields.reviews.rating
+  if rating_source.type == 'rating'
+    assign average = rating_source.value.rating
+  else
+    assign average = rating_source.value
+  endif
+  if average == blank and total > 0
+    assign average = rating_sum | times: 1.0 | divided_by: total | round: 1
+  endif
+  assign review_count = product.metafields.custom.rating_count.value | default: product.metafields.reviews.rating_count.value | default: total
+  assign review_count_label = section.settings.based_on_label | replace: '[count]', review_count
+-%}
+
+<section
+  id="{{ section.settings.anchor | default: 'avis' | handleize }}"
+  class="knr-section knr-reviews"
+  aria-labelledby="KnrReviews-{{ section.id }}"
+>
+  <knr-reviews class="knr-reviews__inner knr-container" data-page-size="{{ section.settings.page_size }}">
+    <h2 id="KnrReviews-{{ section.id }}" class="knr-reviews__heading{{ reveal }}">{{ section.settings.heading | escape }}</h2>
+
+    <div class="knr-reviews__summary{{ reveal }}">
+      {%- if average != blank -%}
+        <div class="knr-reviews__score">
+          <p class="knr-reviews__average">
+            {%- render 'knr-stars', rating: average -%}
+            <span>{{ average }} {{ section.settings.out_of_label | escape }}</span>
+          </p>
+          <p class="knr-reviews__count">{{ review_count_label | escape }}</p>
+        </div>
+      {%- endif -%}
+
+      {%- if total > 0 -%}
+        <ul class="knr-reviews__bars" role="list" aria-label="{{ 'knr.reviews.distribution' | t }}">
+          {%- for i in (1..5) -%}
+            {%- liquid
+              assign stars = 6 | minus: i
+              case stars
+                when 5
+                  assign n = star_5
+                when 4
+                  assign n = star_4
+                when 3
+                  assign n = star_3
+                when 2
+                  assign n = star_2
+                else
+                  assign n = star_1
+              endcase
+              assign pct = n | times: 100.0 | divided_by: total | round
+            -%}
+            <li class="knr-reviews__bar-row">
+              {%- render 'knr-stars', rating: stars -%}
+              <span class="knr-reviews__bar" style="--knr-bar: {{ pct }}%;"></span>
+              <span class="knr-reviews__bar-count">
+                {{- n -}}
+                <span class="knr-visually-hidden">{{ 'knr.reviews.bar_label' | t: count: n, stars: stars }}</span>
+              </span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      <div class="knr-reviews__actions">
+        {%- if section.settings.write_link != blank -%}
+          <a class="knr-button" href="{{ section.settings.write_link }}">{{ section.settings.write_label | escape }}</a>
+        {%- endif -%}
+        {%- if section.settings.ask_link != blank -%}
+          <a class="knr-button knr-button--outline" href="{{ section.settings.ask_link }}">{{ section.settings.ask_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if total > 0 -%}
+      <div class="knr-reviews__toolbar">
+        <div class="knr-reviews__filter">
+          {%- render 'knr-icon', icon: 'filter' -%}
+          <label for="KnrReviewsFilter-{{ section.id }}">{{ section.settings.filter_label | escape }}</label>
+          <span class="knr-reviews__filter-value" data-reviews-filter-value></span>
+          <select id="KnrReviewsFilter-{{ section.id }}" class="knr-reviews__select" data-reviews-filter>
+            <option value="all">{{ section.settings.all_label | escape }}</option>
+            {%- for i in (1..5) -%}
+              {%- assign stars = 6 | minus: i -%}
+              <option value="{{ stars }}">{{ 'knr.reviews.stars_option' | t: count: stars }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+        <p class="knr-visually-hidden" aria-live="polite" data-reviews-status data-template="{{ section.settings.based_on_label | escape }}"></p>
+      </div>
+
+      <ul class="knr-reviews__list" role="list">
+        {%- if use_metaobjects -%}
+          {%- for item in review_items -%}
+            {%- assign r = item.rating.value.rating | default: item.rating.value | default: 5 -%}
+            {%- render 'knr-review-item',
+              rating: r,
+              author: item.author.value,
+              verified: item.verified.value,
+              verified_label: section.settings.verified_label,
+              title: item.title.value,
+              body: item.body.value,
+              date: item.date.value
+            -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in section.blocks -%}
+            {%- render 'knr-review-item',
+              attributes: block.shopify_attributes,
+              rating: block.settings.rating,
+              author: block.settings.author,
+              verified: block.settings.verified,
+              verified_label: section.settings.verified_label,
+              title: block.settings.title,
+              body: block.settings.body,
+              date: block.settings.date
+            -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+
+      <div class="knr-reviews__more">
+        <button type="button" class="knr-button knr-button--outline" data-reviews-more>
+          {{- section.settings.load_more_label | escape -}}
+        </button>
+      </div>
+    {%- endif -%}
+  </knr-reviews>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Reviews",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Avis clients"
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor",
+      "info": "Linked from the rating in the product buy box.",
+      "default": "avis"
+    },
+    {
+      "type": "text",
+      "id": "metafield",
+      "label": "Product metafield (namespace.key)",
+      "info": "List of review metaobjects (fields: author, verified, title, body, rating, date). When empty, the blocks below are used.",
+      "default": "custom.reviews"
+    },
+    {
+      "type": "range",
+      "id": "page_size",
+      "label": "Reviews per page",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "write_label",
+      "label": "Write a review label",
+      "default": "Écrire un avis"
+    },
+    {
+      "type": "url",
+      "id": "write_link",
+      "label": "Write a review link"
+    },
+    {
+      "type": "text",
+      "id": "ask_label",
+      "label": "Ask a question label",
+      "default": "Poser une question"
+    },
+    {
+      "type": "url",
+      "id": "ask_link",
+      "label": "Ask a question link"
+    },
+    {
+      "type": "header",
+      "content": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "out_of_label",
+      "label": "Score suffix",
+      "default": "sur 5"
+    },
+    {
+      "type": "text",
+      "id": "based_on_label",
+      "label": "Review count",
+      "info": "[count] is replaced by the number of reviews.",
+      "default": "Basé sur [count] avis"
+    },
+    {
+      "type": "text",
+      "id": "filter_label",
+      "label": "Filter",
+      "default": "Filtrer"
+    },
+    {
+      "type": "text",
+      "id": "all_label",
+      "label": "All ratings",
+      "default": "Toutes les notes"
+    },
+    {
+      "type": "text",
+      "id": "verified_label",
+      "label": "Verified badge",
+      "default": "Vérifié"
+    },
+    {
+      "type": "text",
+      "id": "load_more_label",
+      "label": "Load more",
+      "default": "Charger plus"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Mathilde S"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified buyer",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date (YYYY-MM-DD)",
+          "default": "2026-02-09"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Après usage d’1 mois"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Review"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Reviews",
+      "blocks": [{ "type": "review" }, { "type": "review" }, { "type": "review" }]
+    }
+  ]
+}
+{% endschema %}

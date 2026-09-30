@@ -1,0 +1,47 @@
+/* KNR · FAQ */
+
+.knr-faq {
+  padding: 40px 0 88px;
+  background: var(--knr-white);
+}
+
+.knr-faq__heading {
+  font-size: var(--knr-fs-display);
+  line-height: 1.25;
+  text-align: center;
+}
+
+.knr-faq__list {
+  max-width: 720px;
+  margin: 40px auto 0;
+}
+
+.knr-faq__item > summary {
+  padding: 20px 0;
+}
+
+.knr-faq__question {
+  font-size: var(--knr-fs-lead);
+  line-height: 32px;
+}
+
+.knr-faq__answer {
+  margin-top: -4px;
+  padding-bottom: 20px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+@media screen and (min-width: 990px) {
+  .knr-faq {
+    padding: 120px 0;
+  }
+
+  .knr-faq__heading {
+    line-height: 1.2;
+  }
+
+  .knr-faq__list {
+    margin-top: 80px;
+  }
+}

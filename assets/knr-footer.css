@@ -1,0 +1,242 @@
+/* KNR · Footer */
+
+.knr-footer {
+  background: var(--knr-ivory);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.knr-footer a {
+  text-decoration: none;
+}
+
+.knr-footer__links a:hover,
+.knr-footer__links a[aria-current='page'] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.knr-footer__top {
+  padding-top: 64px;
+}
+
+.knr-footer__heading {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+/* Menus: accordions on mobile */
+
+.knr-footer__menu > summary {
+  padding: 16px 0;
+}
+
+.knr-footer__menu:last-of-type {
+  border-bottom: 0;
+}
+
+.knr-footer__links {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0 0 20px;
+  list-style: none;
+}
+
+/* About */
+
+.knr-footer__about {
+  margin-top: 40px;
+}
+
+.knr-footer__about-text {
+  margin-top: 24px;
+}
+
+.knr-footer__badge {
+  width: 48px;
+  height: auto;
+  margin-top: 20px;
+}
+
+.knr-footer__caption {
+  margin-top: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--knr-sand);
+}
+
+.knr-footer__certificate {
+  margin-top: 18px;
+  font-size: 12px;
+}
+
+/* Wordmark */
+
+.knr-footer__wordmark {
+  margin: 36px 0 38px;
+}
+
+.knr-footer__wordmark svg,
+.knr-footer__wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.knr-footer__wordmark text {
+  fill: var(--knr-black);
+  font-family: 'KNR Inter', var(--font-body-family);
+  font-size: 188px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Bottom bar */
+
+.knr-footer__bottom {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--knr-sand);
+  text-align: center;
+}
+
+.knr-footer__localization {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.knr-footer__localization :is(localization-form, .localization-form, .disclosure) {
+  margin: 0;
+  padding: 0;
+}
+
+/* Dawn's selector is styled as a boxed form field; the design wants a plain label + chevron. */
+.knr-footer__localization .disclosure__button.localization-form__select {
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  margin: 0;
+  padding: 0 18px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--knr-black);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: inherit;
+  text-decoration: none;
+}
+
+.knr-footer__localization .localization-form__select::before,
+.knr-footer__localization .localization-form__select::after {
+  content: none;
+}
+
+.knr-footer__localization .localization-form__select:hover span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.knr-footer__localization .localization-form__select .icon-caret {
+  top: 50%;
+  right: 0;
+  width: 10px;
+  height: 6px;
+  transform: translateY(-50%);
+}
+
+.knr-footer__localization .localization-form__select[aria-expanded='true'] .icon-caret {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.knr-footer__localization .disclosure__list-wrapper {
+  text-align: left;
+}
+
+.knr-footer__copyright {
+  font-size: 12px;
+}
+
+.knr-footer__social {
+  display: flex;
+  gap: 18px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knr-footer__social a {
+  display: flex;
+  padding: 4px;
+}
+
+@media screen and (max-width: 749px) {
+  .knr-footer__bottom {
+    padding-top: 36px;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .knr-footer__top {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.25fr);
+    align-items: start;
+    padding-top: 80px;
+  }
+
+  .knr-footer__menu {
+    border: 0;
+  }
+
+  .knr-footer__menu > summary {
+    padding: 0;
+    cursor: default;
+  }
+
+  .knr-footer__menu .knr-accordion__icon {
+    display: none;
+  }
+
+  .knr-footer__links {
+    gap: 16px;
+    padding: 24px 24px 0 0;
+  }
+
+  .knr-footer__about {
+    margin-top: 0;
+  }
+
+  .knr-footer__wordmark {
+    margin: 36px 0 80px;
+    padding-inline: var(--knr-gutter);
+  }
+
+  .knr-footer__bottom {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding-top: 40px;
+    text-align: left;
+  }
+
+  .knr-footer__localization {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .knr-footer__copyright {
+    grid-column: 2;
+  }
+
+  .knr-footer__social {
+    grid-column: 3;
+    justify-self: end;
+    margin: 0;
+  }
+}

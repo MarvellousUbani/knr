@@ -1,0 +1,103 @@
+/* KNR · Product story — full-bleed image with eyebrow and quote overlay. */
+
+.knr-story {
+  position: relative;
+  display: flex;
+  min-height: 747px;
+  color: var(--knr-white);
+  background: #9a9384;
+}
+
+.knr-story__media {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
+
+/* Mobile: flat overlay + shade behind the eyebrow (top) and the quote (bottom). */
+.knr-story__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 22%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.12) 40%, rgba(0, 0, 0, 0) 60%),
+    rgba(0, 0, 0, var(--knr-story-overlay-mobile, 0.16));
+}
+
+@media screen and (min-width: 750px) {
+  .knr-story__media::after {
+    background: rgba(0, 0, 0, var(--knr-story-overlay, 0.1));
+  }
+}
+
+.knr-story__media picture,
+.knr-story__media img,
+.knr-story__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.knr-story__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 83px;
+  padding-bottom: 80px;
+}
+
+.knr-story__eyebrow {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.knr-story__eyebrow::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 1px;
+  margin-top: 10px;
+  background: currentColor;
+}
+
+.knr-story__text {
+  font-size: 22px;
+  line-height: 24px;
+}
+
+.knr-story__text p + p {
+  margin-top: 0.5em;
+}
+
+.knr-story__author {
+  margin-top: 16px;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-story {
+    min-height: clamp(480px, 50vw, 720px);
+  }
+
+  .knr-story__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 510px);
+    align-items: center;
+    column-gap: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .knr-story__eyebrow {
+    align-self: center;
+  }
+
+  .knr-story__text {
+    font-size: clamp(24px, calc(8px + 1.667vw), 32px);
+    line-height: 1.25;
+  }
+}

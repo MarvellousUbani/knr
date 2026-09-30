@@ -1,0 +1,110 @@
+{{ 'knr-latest-news.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- assign news_blog = section.settings.blog | default: blogs.news -%}
+
+<section class="knr-section knr-news" aria-labelledby="KnrNews-{{ section.id }}">
+  <knr-scroller class="knr-news__inner">
+    <h2 id="KnrNews-{{ section.id }}" class="knr-news__heading knr-heading-title{{ reveal }}">{{ section.settings.heading | escape }}</h2>
+
+    <ul class="knr-scroller knr-news__list" role="list" data-scroller-track>
+      {%- for article in news_blog.articles limit: section.settings.articles_count -%}
+        <li class="knr-news__item{{ reveal }}" data-cascade style="--animation-order: {{ forloop.index }};">
+          <article class="knr-news__card">
+            <a class="knr-media knr-news__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+              {%- if article.image -%}
+                {{
+                  article.image
+                  | image_url: width: 1002
+                  | image_tag:
+                    widths: '255, 334, 510, 668, 1002',
+                    sizes: '(min-width: 750px) calc((100vw - 104px) / 4), 255px',
+                    loading: 'lazy',
+                    alt: ''
+                }}
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </a>
+            {%- if article.tags.size > 0 -%}
+              <p class="knr-news__tag">{{ article.tags.first | escape }}</p>
+            {%- endif -%}
+            <h3 class="knr-news__title">
+              <a href="{{ article.url }}">{{ article.title | escape }}</a>
+            </h3>
+            <p class="knr-news__excerpt">
+              {%- if article.excerpt != blank -%}
+                {{ article.excerpt | strip_html | truncatewords: 30 }}
+              {%- else -%}
+                {{ article.content | strip_html | truncatewords: 22 }}
+              {%- endif -%}
+            </p>
+          </article>
+        </li>
+      {%- else -%}
+        {%- for i in (1..4) -%}
+          <li class="knr-news__item">
+            <article class="knr-news__card">
+              <div class="knr-media knr-news__media">{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+              <h3 class="knr-news__title">{{ 'knr.news.placeholder_title' | t }}</h3>
+            </article>
+          </li>
+        {%- endfor -%}
+      {%- endfor -%}
+    </ul>
+
+    <div class="knr-progress knr-news__progress" aria-hidden="true">
+      <span class="knr-progress__bar" data-progress-bar></span>
+    </div>
+
+    {%- if section.settings.view_all_label != blank and news_blog -%}
+      <a class="knr-link knr-news__all" href="{{ news_blog.url }}">{{ section.settings.view_all_label | escape }}</a>
+    {%- endif -%}
+  </knr-scroller>
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Latest news",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Latest news"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "articles_count",
+      "label": "Articles",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all label",
+      "default": "Voir tous les articles"
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Latest news"
+    }
+  ]
+}
+{% endschema %}

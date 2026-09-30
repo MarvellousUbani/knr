@@ -1,0 +1,500 @@
+/*
+  KNR — shared tokens and primitives for all `knr-` sections.
+  Everything is namespaced under `.knr-*` classes so nothing leaks into Dawn.
+  Values come from the Figma frames (desktop 1440px / mobile 390px).
+*/
+
+.knr-section,
+.knr-footer {
+  --knr-black: #000;
+  --knr-white: #fff;
+  --knr-ivory: #f9f8f5;
+  --knr-sand: #dcd5c3;
+  --knr-stone: #dfdbd6;
+  --knr-gold: #b5a282;
+  --knr-line: rgba(0, 0, 0, 0.24);
+
+  --knr-gutter: 24px;
+  --knr-radius: 4px;
+
+  /* Fluid type: first value = 390px frame, last value = 1440px frame. */
+  --knr-fs-display: clamp(32px, calc(29.03px + 0.762vw), 40px);
+  --knr-fs-title: 32px;
+  --knr-fs-quote: clamp(24px, calc(21.03px + 0.762vw), 32px);
+  --knr-fs-lead: 24px;
+
+  --knr-font: 'KNR Inter', var(--font-body-family);
+
+  font-family: var(--knr-font);
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 400;
+  /* Figma body copy is set ~2% tighter; large text relies on Inter's optical size. */
+  letter-spacing: -0.02em;
+  color: var(--knr-black);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media screen and (min-width: 990px) {
+  .knr-section,
+  .knr-footer {
+    --knr-gutter: 40px;
+    --knr-radius: 0;
+  }
+}
+
+.knr-section *,
+.knr-footer * {
+  letter-spacing: inherit;
+}
+
+.knr-section :where(h1, h2, h3, h4, p, ul, ol, blockquote, figure),
+.knr-footer :where(h1, h2, h3, h4, p, ul, ol, blockquote, figure) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 400;
+  color: inherit;
+}
+
+.knr-section :where(img),
+.knr-footer :where(img) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.knr-section :where(a),
+.knr-footer :where(a) {
+  color: inherit;
+}
+
+.knr-section :where(button),
+.knr-footer :where(button) {
+  font: inherit;
+  color: inherit;
+}
+
+.knr-section svg,
+.knr-footer svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.knr-container {
+  padding-inline: var(--knr-gutter);
+}
+
+/* Headings ---------------------------------------------------------------- */
+
+/*
+  Tracking tokens, calibrated against the Figma text widths (Inter with optical
+  sizing): 10-12px text -0.04em, 14px and 22-24px text -0.02em, 32px+ text 0.
+  The base (-0.02em) is set on .knr-section / .knr-footer.
+*/
+.knr-footer,
+.knr-caption,
+.knr-small,
+.knr-link,
+.knr-button,
+.knr-panel,
+.knr-sticky,
+.knr-story__eyebrow,
+.knr-story__author,
+.knr-testimonials__meta,
+.knr-reviews__summary,
+.knr-reviews__toolbar,
+.knr-reviews__list,
+.knr-news__tag,
+.knr-brand__input,
+.knr-brand__disclaimer,
+.knr-reassurance__text {
+  --knr-tracking: -0.04em;
+  letter-spacing: var(--knr-tracking);
+}
+
+.knr-panel__title,
+.knr-price__current,
+.knr-reassurance__title,
+.knr-heading-lead,
+.knr-howto__title,
+.knr-faq__question,
+.knr-news__title,
+.knr-reviews__heading,
+.knr-story__text,
+.knr-testimonials__text-quote {
+  letter-spacing: -0.02em;
+}
+
+.knr-heading-display,
+.knr-heading-title,
+.knr-testimonials__heading,
+.knr-faq__heading,
+.knr-brand__heading {
+  letter-spacing: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .knr-story__text,
+  .knr-testimonials__text-quote,
+  .knr-reviews__heading {
+    letter-spacing: 0;
+  }
+}
+
+.knr-heading-display {
+  font-size: var(--knr-fs-display);
+  line-height: 1.2;
+}
+
+.knr-heading-title {
+  font-size: var(--knr-fs-title);
+  line-height: 1.25;
+}
+
+.knr-heading-lead {
+  font-size: var(--knr-fs-lead);
+  line-height: 1.333;
+}
+
+.knr-body {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.knr-small {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.knr-caption {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.knr-rte > * + * {
+  margin-top: 1em;
+}
+
+/* Pasted content often uses one <div> per line: treat those as lines, not paragraphs. */
+.knr-rte > div + div {
+  margin-top: 0;
+}
+
+.knr-rte a {
+  text-underline-offset: 3px;
+}
+
+/* Guard against rich text pasted from Word/Docs carrying inline fonts. */
+.knr-rte [style] {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.knr-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1px solid var(--knr-black);
+  border-radius: var(--knr-radius);
+  background: var(--knr-black);
+  color: var(--knr-white);
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.knr-button:hover {
+  background: #262626;
+}
+
+.knr-button--outline {
+  background: transparent;
+  color: var(--knr-black);
+}
+
+.knr-button--outline:hover {
+  background: var(--knr-black);
+  color: var(--knr-white);
+}
+
+.knr-button:focus-visible,
+.knr-link:focus-visible,
+.knr-icon-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+.knr-link {
+  display: inline-block;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.knr-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.knr-icon-button[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Stars ------------------------------------------------------------------- */
+
+.knr-stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--knr-gold);
+}
+
+.knr-stars svg {
+  width: 10px;
+  height: 10px;
+}
+
+.knr-stars--lg svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* Horizontal scroller (mobile carousels) --------------------------------- */
+
+.knr-scroller {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.knr-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.knr-scroller > * {
+  scroll-snap-align: start;
+}
+
+.knr-progress {
+  position: relative;
+  width: 98px;
+  height: 1px;
+  margin-inline: auto;
+  background: var(--knr-sand);
+}
+
+.knr-progress__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--knr-progress-size, 25%);
+  background: var(--knr-black);
+  transform: translateX(var(--knr-progress-offset, 0%));
+  transition: transform 0.2s linear;
+}
+
+/* Dash pagination (rotators) --------------------------------------------- */
+
+.knr-dashes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.knr-dashes button {
+  width: 16px;
+  height: 9px;
+  padding: 4px 0;
+  border: 0;
+  background: var(--knr-sand);
+  background-clip: content-box;
+  cursor: pointer;
+}
+
+.knr-dashes button[aria-current='true'] {
+  background-color: var(--knr-black);
+}
+
+/* Accordion (details/summary) -------------------------------------------- */
+
+.knr-accordion {
+  border-top: 1px solid var(--knr-line);
+}
+
+.knr-accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.knr-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.knr-accordion > summary:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+.knr-accordion__icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s ease;
+}
+
+.knr-accordion[open] .knr-accordion__icon {
+  transform: rotate(180deg);
+}
+
+@media screen and (max-width: 749px) {
+  .knr-accordion__icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Utilities --------------------------------------------------------------- */
+
+.knr-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+
+.knr-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--knr-ivory);
+}
+
+.knr-media > picture {
+  display: block;
+  height: 100%;
+}
+
+.knr-media > img,
+.knr-media > picture > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knr-section *,
+  .knr-footer * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+/* Motion ------------------------------------------------------------------
+   Scroll reveals use Dawn's `scroll-trigger` system (theme setting
+   "Reveal sections on scroll"). Everything below is CSS-only and skipped for
+   visitors who prefer reduced motion. */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cards inside mobile swipe carousels stay visible (same as Dawn sliders). */
+  @media screen and (max-width: 749px) {
+    .knr-scroller > .scroll-trigger.animate--slide-in {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Slow image zoom on hover (pointer devices only). */
+  @media (hover: hover) {
+    .knr-howto__media img,
+    .knr-news__media img,
+    .knr-mini-card__media img,
+    .knr-gallery__item:not(.knr-gallery__item--hero) .knr-gallery__media img {
+      transition: transform 1.2s cubic-bezier(0.2, 0.6, 0.2, 1);
+    }
+
+    .knr-howto__step:hover .knr-howto__media img,
+    .knr-news__card:hover .knr-news__media img,
+    .knr-mini-card:hover .knr-mini-card__media img,
+    .knr-gallery__item:not(.knr-gallery__item--hero):hover .knr-gallery__media img {
+      transform: scale(1.04);
+    }
+  }
+
+  /* Smooth accordion height (progressive enhancement). */
+  @supports (interpolate-size: allow-keywords) {
+    .knr-accordion {
+      interpolate-size: allow-keywords;
+    }
+
+    .knr-accordion::details-content {
+      height: 0;
+      overflow: clip;
+      transition: height 0.35s cubic-bezier(0.2, 0.6, 0.2, 1), content-visibility 0.35s allow-discrete;
+    }
+
+    .knr-accordion[open]::details-content {
+      height: auto;
+    }
+  }
+
+  /* Rotating messages / quotes fade in. */
+  [data-rotator-slide]:not([hidden]) {
+    animation: knr-fade-in 0.5s ease both;
+  }
+
+  .knr-link,
+  .knr-footer__links a,
+  .knr-mini-card__add,
+  .knr-icon-button {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .knr-link:hover,
+  .knr-icon-button:not([disabled]):hover {
+    opacity: 0.6;
+  }
+
+  .knr-mini-card__add:hover {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes knr-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

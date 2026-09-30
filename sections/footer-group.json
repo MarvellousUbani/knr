@@ -1,1 +1,111 @@
-{"name":"t:sections.footer.name","type":"footer","sections":{"footer":{"type":"footer","settings":{"color_scheme":"scheme-1","newsletter_enable":true,"newsletter_heading":"Subscribe to our emails","enable_follow_on_shop":true,"show_social":true,"enable_country_selector":true,"enable_language_selector":true,"payment_enable":true,"show_policy":true,"margin_top":0,"padding_top":36,"padding_bottom":36}}},"order":["footer"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "reassurance": {
+      "type": "knr-reassurance",
+      "blocks": {
+        "shipping": {
+          "type": "item",
+          "settings": {
+            "title": "Livraison offerte",
+            "text": "Livraison offerte\ndès 60 € d'achat\nen France métropolitaine."
+          }
+        },
+        "returns": {
+          "type": "item",
+          "settings": {
+            "title": "Retours gratuits",
+            "text": "Retours acceptés\njusqu'à 30 jours\naprès réception."
+          }
+        },
+        "payment": {
+          "type": "item",
+          "settings": {
+            "title": "Paiement sécurisé",
+            "text": "Paiement 100 % sécurisé\npar carte bancaire,\nPayPal ou virement."
+          }
+        },
+        "service": {
+          "type": "item",
+          "settings": {
+            "title": "Service client",
+            "text": "Du lundi au vendredi\nde 9h à 18h par email\net téléphone."
+          }
+        }
+      },
+      "block_order": [
+        "shipping",
+        "returns",
+        "payment",
+        "service"
+      ],
+      "settings": {
+        "label": "Nos engagements"
+      }
+    },
+    "footer": {
+      "type": "knr-footer",
+      "blocks": {
+        "menu_discover": {
+          "type": "menu",
+          "settings": {
+            "heading": "Découvrir",
+            "menu": "footer"
+          }
+        },
+        "menu_service": {
+          "type": "menu",
+          "settings": {
+            "heading": "Service client",
+            "menu": "footer-service-client"
+          }
+        },
+        "menu_legal": {
+          "type": "menu",
+          "settings": {
+            "heading": "Légal & Transparence",
+            "menu": "footer-legal"
+          }
+        },
+        "about": {
+          "type": "about",
+          "settings": {
+            "heading": "À propos de Maison Célestine",
+            "text": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d’actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>",
+            "image": "shopify://shop_images/cosmos-organic.png",
+            "caption": "Certifié COSMOS ORGANIC par ECOCERT Greenlife",
+            "link_label": "Voir le certificat",
+            "link": "shopify://pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "menu_discover",
+        "menu_service",
+        "menu_legal",
+        "about"
+      ],
+      "settings": {
+        "wordmark_text": "maison célestine",
+        "copyright": "© [year] Maison Célestine. Tous droits réservés.",
+        "linkedin_link": "https://www.linkedin.com/",
+        "enable_country_selector": true,
+        "enable_language_selector": true
+      }
+    }
+  },
+  "order": [
+    "reassurance",
+    "footer"
+  ]
+}

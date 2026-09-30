@@ -1,0 +1,194 @@
+{{ 'knr-testimonials.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+
+{%- liquid
+  assign before_image = section.settings.before_image
+  assign after_image = section.settings.after_image
+  assign quote_count = section.blocks.size
+-%}
+
+<section class="knr-section knr-testimonials" aria-labelledby="KnrTestimonials-{{ section.id }}">
+  <div class="knr-testimonials__intro knr-container{{ reveal }}">
+    <h2 id="KnrTestimonials-{{ section.id }}" class="knr-testimonials__heading">
+      {{- section.settings.heading | escape -}}
+    </h2>
+    {%- if section.settings.text != blank -%}
+      <div class="knr-testimonials__text">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+
+  {%- if before_image != blank and after_image != blank -%}
+    <div class="knr-testimonials__compare-wrapper{{ reveal }}">
+      <knr-before-after class="knr-compare" style="--knr-ba-pos: 50%;">
+        <div class="knr-compare__image knr-compare__image--after">
+          {{
+            after_image
+            | image_url: width: 2560
+            | image_tag:
+              widths: '390, 750, 1100, 1440, 2000, 2560',
+              sizes: '(min-width: 750px) calc(100vw - 160px), calc(100vw - 48px)',
+              loading: 'lazy',
+              alt: after_image.alt
+          }}
+        </div>
+        <div class="knr-compare__image knr-compare__image--before">
+          {{
+            before_image
+            | image_url: width: 2560
+            | image_tag:
+              widths: '390, 750, 1100, 1440, 2000, 2560',
+              sizes: '(min-width: 750px) calc(100vw - 160px), calc(100vw - 48px)',
+              loading: 'lazy',
+              alt: before_image.alt
+          }}
+        </div>
+
+        <span class="knr-compare__label knr-compare__label--before" aria-hidden="true">
+          {{- section.settings.before_label | escape -}}
+        </span>
+        <span class="knr-compare__label knr-compare__label--after" aria-hidden="true">
+          {{- section.settings.after_label | escape -}}
+        </span>
+
+        <span class="knr-compare__handle" aria-hidden="true">
+          <span class="knr-compare__knob">{%- render 'knr-icon', icon: 'grip' -%}</span>
+        </span>
+
+        <input
+          class="knr-compare__range"
+          type="range"
+          min="0"
+          max="100"
+          value="50"
+          aria-label="{{ 'knr.testimonials.compare_label' | t: before: section.settings.before_label, after: section.settings.after_label | escape }}"
+        >
+      </knr-before-after>
+    </div>
+  {%- endif -%}
+
+  {%- if quote_count > 0 -%}
+    <knr-rotator class="knr-testimonials__quotes knr-container{{ reveal }}">
+      <div class="knr-testimonials__viewport" aria-live="polite">
+        {%- for block in section.blocks -%}
+          <figure
+            class="knr-testimonials__quote"
+            data-rotator-slide
+            {% unless forloop.first %}
+              hidden
+            {% endunless %}
+            {{ block.shopify_attributes }}
+          >
+            <figcaption class="knr-testimonials__meta">
+              {%- render 'knr-stars', rating: block.settings.rating -%}
+              <span class="knr-visually-hidden">{{ 'knr.product.rating_label' | t: rating: block.settings.rating, scale: 5 }}</span>
+              <span>{{ block.settings.author | escape }}</span>
+            </figcaption>
+            <blockquote class="knr-testimonials__text-quote">
+              {{- block.settings.quote | escape | newline_to_br -}}
+            </blockquote>
+          </figure>
+        {%- endfor -%}
+      </div>
+
+      {%- if quote_count > 1 -%}
+        <div class="knr-testimonials__nav">
+          <button type="button" class="knr-icon-button" aria-label="{{ 'knr.general.previous' | t }}" data-rotator-prev>
+            {%- render 'knr-icon', icon: 'chevron-left' -%}
+          </button>
+          <button type="button" class="knr-icon-button" aria-label="{{ 'knr.general.next' | t }}" data-rotator-next>
+            {%- render 'knr-icon', icon: 'chevron-right' -%}
+          </button>
+        </div>
+      {%- endif -%}
+    </knr-rotator>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "KNR · Testimonials",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Ce que disent nos clientes"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Des transformations visibles dès 4 semaines. Nos clientes témoignent d'une peau visiblement régénérée, plus ferme et lumineuse.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Before / after"
+    },
+    {
+      "type": "image_picker",
+      "id": "before_image",
+      "label": "Before image"
+    },
+    {
+      "type": "image_picker",
+      "id": "after_image",
+      "label": "After image",
+      "info": "Use images with the same framing and ratio (2:1 recommended)."
+    },
+    {
+      "type": "text",
+      "id": "before_label",
+      "label": "Before label",
+      "default": "Before"
+    },
+    {
+      "type": "text",
+      "id": "after_label",
+      "label": "After label",
+      "default": "After"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Clara T."
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR · Testimonials",
+      "blocks": [{ "type": "testimonial" }, { "type": "testimonial" }]
+    }
+  ]
+}
+{% endschema %}
